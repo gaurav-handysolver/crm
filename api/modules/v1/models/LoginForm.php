@@ -1,33 +1,22 @@
 <?php
+    namespace api\modules\v1\models;
+    use common\models\User;
+
+
     /**
-     * Created by PhpStorm.
-     * User: cyberains
-     * Date: 08-07-2021
-     * Time: 11:07
+     * @property array|\common\models\User|mixed|null _user
      */
-
-
-namespace app\api\modules\v1\models;
-
-
-use common\models\User;
-
-/**
- * @property-read null|\common\models\User $user
- */
-class LoginForm extends User
-{
-    /**
-     * Finds user by [[username]]
-     * @return User|null
-     */
-    public function getUser()
+    class LoginForm extends \backend\models\LoginForm
     {
-        if ($this->user === false) {
-            $this->user = User::findByUsername($this->username);
+        /**
+         * Finds user by [[username]]
+         * @return User|null
+         */
+        public function getUser()
+        {
+            if ($this->user === false) {
+                $this->user = User::findByUsername($this->username);
+            }
+            return $this->user;
         }
-        return $this->user;
     }
-
-    public function login() { }
-}

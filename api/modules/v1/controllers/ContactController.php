@@ -13,4 +13,8 @@
 
 class ContactController extends ActiveController{
     public $modelClass = Contact::class;
+
 }
+
+
+

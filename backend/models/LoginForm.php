@@ -17,7 +17,7 @@ class LoginForm extends Model
     public $password;
     public $rememberMe = true;
 
-    private $user = false;
+    protected $user = false;
 
     /**
      * @inheritdoc

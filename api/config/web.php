@@ -8,6 +8,7 @@ $config = [
         'v1' => \api\modules\v1\Module::class
     ],
     'components' => [
+
         'errorHandler' => [
             'errorAction' => 'site/error'
         ],
@@ -22,6 +23,9 @@ $config = [
         ],
         'request' => [
             'enableCookieValidation' => false,
+            'parsers' => [
+                'application/json' => \yii\web\JsonParser::class
+            ],
         ],
         'user' => [
             'class' => yii\web\User::class,
