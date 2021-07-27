@@ -9,7 +9,7 @@ use yii\helpers\Url;
 
 class SiteController extends Controller
 {
-        /**
+    /**
      * @inheritdoc
      */
     public function actions(): array

@@ -45,6 +45,7 @@ class ContactSearch extends Contact
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false
         ]);
 
         if (!($this->load($params) && $this->validate())) {
