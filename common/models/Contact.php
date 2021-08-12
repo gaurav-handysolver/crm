@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\query\ContactQuery;
+use JeroenDesloovere\VCard\VCard;
 use Yii;
 
 /**
@@ -76,6 +77,43 @@ class Contact extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('common\models', 'Updated At'),
             'created_at' => Yii::t('common\models', 'Created At'),
         ];
+    }
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        $vcard = new VCard( );
+        // define variables
+        $lastname = $this->firstname;
+        $firstname = $this->lastname;
+        $additional = '';
+        $prefix = '';
+        $suffix = '';
+
+        // add personal data
+        $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+
+        // add work data
+        $vcard->addCompany($this->company);
+        $vcard->addJobtitle('');
+        $vcard->addRole('');
+        $vcard->addEmail($this->email);
+        $vcard->addPhoneNumber($this->mobile_number, 'PREF;WORK');
+//        $vcard->addPhoneNumber(123456789, 'WORK');
+        $vcard->addAddress(null, null, '', '', null, '', '');
+//        $vcard->addLabel('street, worktown, workpostcode Belgium');
+        $vcard->addURL($this->website);
+
+        // return vcard as a string
+        //    return $vcard->getOutput();
+
+        $vcard->setFilename($this->id,true);
+        // return vcard as a download
+//        return $vcard->download();
+
+//         save vcard on disk
+        $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
+        $vcard->save();
     }
 
     /**
