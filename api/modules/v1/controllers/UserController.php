@@ -5,6 +5,7 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\models\LoginForm;
 use common\models\User;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
@@ -23,20 +24,20 @@ class UserController extends Controller
      * @return array
      */
 //    public function behaviors()
-//    {
-//        $behaviors = parent::behaviors();
-//
-//        $behaviors['authenticator'] = [
-//            'class' => CompositeAuth::class,
-//            'authMethods' => [
-//                HttpBasicAuth::class,
-//                HttpBearerAuth::class,
-//                HttpHeaderAuth::class,
-//                QueryParamAuth::class
-//            ]
-//        ];
-//        return $behaviors;
-//    }
+    //    {
+    //        $behaviors = parent::behaviors();
+    //
+    //        $behaviors['authenticator'] = [
+    //            'class' => CompositeAuth::class,
+    //            'authMethods' => [
+    //                HttpBasicAuth::class,
+    //                HttpBearerAuth::class,
+    //                HttpHeaderAuth::class,
+    //                QueryParamAuth::class
+    //            ]
+    //        ];
+    //        return $behaviors;
+    //    }
 
     /**
      * @inheritdoc
@@ -51,7 +52,7 @@ class UserController extends Controller
     }
 
     /**
-     * @return User|null|\yii\web\IdentityInterface
+     * @return User|null|ActiveDataProvider|\yii\web\IdentityInterface
      */
     public function actionIndex()
     {
@@ -59,6 +60,7 @@ class UserController extends Controller
         $resource->load(Yii::$app->user->getIdentity()->attributes, '');
         return  $resource;
     }
+
 
     /**
      * @return array

@@ -43,6 +43,7 @@ class Contact extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['email'], 'unique'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],

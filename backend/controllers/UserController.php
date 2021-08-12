@@ -4,8 +4,10 @@ namespace backend\controllers;
 
 use backend\models\search\UserSearch;
 use backend\models\UserForm;
+use common\models\Contact;
 use common\models\User;
 use common\models\UserToken;
+use JeroenDesloovere\VCard\VCard;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -54,6 +56,56 @@ class UserController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * Displays a single User model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUser($id)
+    {
+//        return $this->render('user', [
+//            'model' => $this->findModel($id),
+//        ]);
+//    use JeroenDesloovere\VCard\VCard;
+
+        // define vcard
+        $model = Contact::findOne($id);
+
+        $vcard = new VCard( );
+        // define variables
+        $lastname = $model->firstname;
+        $firstname = $model->lastname;
+        $additional = '';
+        $prefix = '';
+        $suffix = '';
+
+        // add personal data
+        $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+
+        // add work data
+        $vcard->addCompany($model->company);
+        $vcard->addJobtitle('');
+        $vcard->addRole('');
+        $vcard->addEmail($model->email);
+        $vcard->addPhoneNumber($model->mobile_number, 'PREF;WORK');
+//        $vcard->addPhoneNumber(123456789, 'WORK');
+        $vcard->addAddress(null, null, '', '', null, '', '');
+//        $vcard->addLabel('street, worktown, workpostcode Belgium');
+        $vcard->addURL($model->website);
+
+        // return vcard as a string
+        //    return $vcard->getOutput();
+
+        $vcard->setFilename($model->id,true);
+        // return vcard as a download
+//        return $vcard->download();
+
+//         save vcard on disk
+        $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
+        $vcard->save();
+        return Yii::getAlias('@storageUrl').'/web/source/'.$model->id.".vcf";
     }
 
     /**
