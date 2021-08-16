@@ -49,6 +49,7 @@ class Contact extends \yii\db\ActiveRecord
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],
             [['website'], 'string', 'max' => 512],
+            [['notes'], 'string'],
             [['mobile_number'], 'string', 'max' => 20],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
@@ -66,6 +67,7 @@ class Contact extends \yii\db\ActiveRecord
             'email' => Yii::t('common\models', 'Email'),
             'company' => Yii::t('common\models', 'Company'),
             'website' => Yii::t('common\models', 'Website'),
+            'notes' => Yii::t('common\models', 'Notes'),
             'mobile_number' => Yii::t('common\models', 'Mobile Number'),
             'birthday' => Yii::t('common\models', 'Birthday'),
             'pollguru' => Yii::t('common\models', 'Pollguru'),
@@ -84,14 +86,14 @@ class Contact extends \yii\db\ActiveRecord
 
         $vcard = new VCard( );
         // define variables
-        $lastname = $this->firstname;
-        $firstname = $this->lastname;
+        $firstname = $this->firstname;
+        $lastname = $this->lastname;
         $additional = '';
         $prefix = '';
         $suffix = '';
 
         // add personal data
-        $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+        $vcard->addName($firstname, $lastname, $additional, $prefix, $suffix);
 
         // add work data
         $vcard->addCompany($this->company);
