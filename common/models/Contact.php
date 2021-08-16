@@ -15,6 +15,9 @@ use Yii;
  * @property string|null $email
  * @property string|null $company
  * @property string|null $website
+ * @property string|null $notes
+ * @property string|null $address
+ * @property string|null $imageUrl
  * @property string|null $mobile_number
  * @property string|null $birthday
  * @property int|null $pollguru
@@ -43,13 +46,14 @@ class Contact extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+//        ,'imageUrl'
         return [
             [['email'], 'unique'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],
             [['website'], 'string', 'max' => 512],
-            [['notes'], 'string'],
+            [['notes','address'], 'string'],
             [['mobile_number'], 'string', 'max' => 20],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
@@ -68,6 +72,8 @@ class Contact extends \yii\db\ActiveRecord
             'company' => Yii::t('common\models', 'Company'),
             'website' => Yii::t('common\models', 'Website'),
             'notes' => Yii::t('common\models', 'Notes'),
+            'address' => Yii::t('common\models', 'Address'),
+//            'imageUrl' => Yii::t('common\models', 'Image'),
             'mobile_number' => Yii::t('common\models', 'Mobile Number'),
             'birthday' => Yii::t('common\models', 'Birthday'),
             'pollguru' => Yii::t('common\models', 'Pollguru'),
@@ -93,7 +99,7 @@ class Contact extends \yii\db\ActiveRecord
         $suffix = '';
 
         // add personal data
-        $vcard->addName($firstname, $lastname, $additional, $prefix, $suffix);
+        $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
 
         // add work data
         $vcard->addCompany($this->company);
