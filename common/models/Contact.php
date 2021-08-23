@@ -46,7 +46,6 @@ class Contact extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-//        ,'imageUrl'
         return [
             [['email'], 'unique'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
@@ -54,6 +53,7 @@ class Contact extends \yii\db\ActiveRecord
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],
             [['website'], 'string', 'max' => 512],
             [['notes','address'], 'string'],
+            [['imageUrl'], 'file'], //extension=>'jpg,png
             [['mobile_number'], 'string', 'max' => 20],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
@@ -73,7 +73,7 @@ class Contact extends \yii\db\ActiveRecord
             'website' => Yii::t('common\models', 'Website'),
             'notes' => Yii::t('common\models', 'Notes'),
             'address' => Yii::t('common\models', 'Address'),
-//            'imageUrl' => Yii::t('common\models', 'Image'),
+            'imageUrl' => Yii::t('common\models', 'Image'),
             'mobile_number' => Yii::t('common\models', 'Mobile Number'),
             'birthday' => Yii::t('common\models', 'Birthday'),
             'pollguru' => Yii::t('common\models', 'Pollguru'),
@@ -100,7 +100,9 @@ class Contact extends \yii\db\ActiveRecord
 
         // add personal data
         $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
-
+        if (!empty($this->imageUrl)){
+            $vcard->addPhoto($this->imageUrl,true);
+        }
         // add work data
         $vcard->addCompany($this->company);
         $vcard->addJobtitle('');
@@ -108,9 +110,10 @@ class Contact extends \yii\db\ActiveRecord
         $vcard->addEmail($this->email);
         $vcard->addPhoneNumber($this->mobile_number, 'PREF;WORK');
 //        $vcard->addPhoneNumber(123456789, 'WORK');
-        $vcard->addAddress(null, null, '', '', null, '', '');
+        $vcard->addAddress($this->address);
 //        $vcard->addLabel('street, worktown, workpostcode Belgium');
         $vcard->addURL($this->website);
+        $vcard->addNote($this->notes);
 
         // return vcard as a string
         //    return $vcard->getOutput();
@@ -121,7 +124,7 @@ class Contact extends \yii\db\ActiveRecord
 
 //         save vcard on disk
         $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
-        $vcard->save();
+        return $vcard->save();
     }
 
     /**

@@ -44,6 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                      'website',
                      'mobile_number',
                      'birthday',
+                    'address',
+                    'notes',
 //                     'pollguru',
 //                     'buzz',
 //                     'learning_arcade',

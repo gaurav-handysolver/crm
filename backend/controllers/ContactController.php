@@ -8,6 +8,7 @@ use backend\models\search\ContactSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * ContactController implements the CRUD actions for Contact model.
@@ -62,6 +63,7 @@ class ContactController extends Controller
      */
     public function actionCreate()
     {
+        phpinfo(); die();
         $model = new Contact();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
