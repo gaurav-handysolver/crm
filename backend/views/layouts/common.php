@@ -157,10 +157,7 @@ $logEntries[] = [
         <a href="/" class="brand-link text-center <?php echo $keyStorage->get('adminlte.brand-text-small') ? 'text-sm' : null ?>">
             <!-- <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
                 style="opacity: .8"> -->
-            <span class="brand-text font-weight-bold"><?php echo Html::img(
-                    Yii::$app->user->identity->userProfile->getAvatar('./img/anonymous.png'),
-                    ['class' => ['img-circle', 'elevation-2', 'bg-white'], 'alt' => 'User']
-                ) ?></span>
+            <span class="brand-text font-weight-bold"> LFC -CRM </span>
         </a>
         <!-- /brand logo -->
 

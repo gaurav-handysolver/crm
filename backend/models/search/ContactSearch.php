@@ -18,8 +18,8 @@ class ContactSearch extends Contact
     public function rules()
     {
         return [
-            [['id', 'pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
-            [['firstname', 'lastname', 'email', 'company', 'website', 'mobile_number', 'birthday', 'updated_at', 'created_at'], 'safe'],
+            [['id', 'pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge'], 'integer'],
+            [['firstname', 'lastname', 'email', 'company', 'website','created_by', 'mobile_number', 'birthday', 'updated_at', 'created_at'], 'safe'],
         ];
     }
 
@@ -45,12 +45,16 @@ class ContactSearch extends Contact
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => false
+            'pagination' => [
+                'pageSize'=> isset(Yii::$app->params['defaultPageSize']) ? Yii::$app->params['defaultPageSize'] : 10,
+            ],
         ]);
 
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
+
+        $query->joinWith(['createdBy']);
 
         $query->andFilterWhere([
             'id' => $this->id,
@@ -60,7 +64,6 @@ class ContactSearch extends Contact
             'learning_arcade' => $this->learning_arcade,
             'training_pipeline' => $this->training_pipeline,
             'leadership_edge' => $this->leadership_edge,
-            'created_by' => $this->created_by,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
         ]);
@@ -70,8 +73,8 @@ class ContactSearch extends Contact
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'company', $this->company])
             ->andFilterWhere(['like', 'website', $this->website])
-            ->andFilterWhere(['like', 'mobile_number', $this->mobile_number]);
-
+            ->andFilterWhere(['like', 'mobile_number', $this->mobile_number])
+            ->andFilterWhere(['like', 'tbl_user.username', $this->created_by]);
         return $dataProvider;
     }
 }

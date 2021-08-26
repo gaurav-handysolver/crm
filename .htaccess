@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine on
+  php_value upload_max_filesize 30M
+  php_value post_max_size 30M
+</IfModule>

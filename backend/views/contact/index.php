@@ -14,11 +14,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="contact-index">
     <div class="card">
-        <div class="card-header">
-            <?php echo Html::a(Yii::t('backend', 'Create {modelClass}', [
-    'modelClass' => 'Contact',
-]), ['create'], ['class' => 'btn btn-success']) ?>
-        </div>
+<!--        <div class="card-header">-->
+<!--            --><?php //echo Html::a(Yii::t('backend', 'Create {modelClass}', ['modelClass' => 'Contact',]), ['create'], ['class' => 'btn btn-success']) ?>
+<!--        </div>-->
 
         <div class="card-body p-0">
             <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -35,27 +33,112 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterModel' => $searchModel,
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
-
-//                    'id',
+                    [
+                        'attribute' => 'id',
+                        'label' => 'Contact Id',
+                        'visible' => false
+                    ],
+                    [
+                        'attribute' => 'imageUrl',
+                        'label' => 'Image',
+                        'value' => 'imageUrl',
+                        'format' => ['image',['width'=>'50','height'=>'50']],
+                    ],
+//                    [
+//                        'attribute' => 'firstname',
+//                        'label' => 'Name',
+//                        'value' => function($data){
+//                            return $data->firstname." ".$data->lastname;
+//                        },
+//                    ],
                     'firstname',
                     'lastname',
                     'email:email',
-                    'company',
-                     'website',
-                     'mobile_number',
-                     'birthday',
-                    'address',
-                    'notes',
-//                     'pollguru',
-//                     'buzz',
-//                     'learning_arcade',
-//                     'training_pipeline',
-//                     'leadership_edge',
-                     'created_by',
-                     'updated_at',
-                     'created_at',
-                    
-                    ['class' => \common\widgets\ActionColumn::class],
+//                    'company',
+                    [
+                        'attribute' => 'company',
+                        'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
+                    ],
+//                    'website',
+                    [
+                        'attribute' => 'website',
+                        'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
+                    ],
+                    'mobile_number',
+//                    'birthday',
+                    [
+                        'attribute' => 'address',
+                        'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
+                    ],
+                    [
+                        'attribute' => 'notes',
+                        'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
+                    ],
+                    [
+                        'attribute' => 'pollguru',
+                        'label' => 'Poll Guru',
+                        'value' => function($data){
+                            if ($data->pollguru){
+                                return "Yes";
+                            }else{
+                                return "NO";
+                            }
+                        }
+                    ],
+                    [
+                        'attribute' => 'buzz',
+                        'label' => 'Buzz',
+                        'value' => function($data){
+                            if ($data->buzz){
+                                return "Yes";
+                            }else{
+                                return "NO";
+                            }
+                        }
+                    ],
+                    [
+                        'attribute' => 'learning_arcade',
+                        'label' => 'Learning Arcade',
+                        'value' => function($data){
+                            if ($data->learning_arcade){
+                                return "Yes";
+                            }else{
+                                return "NO";
+                            }
+                        }
+                    ],
+                    [
+                        'attribute' => 'training_pipeline',
+                        'label' => 'Training Pipeline',
+                        'value' => function($data){
+                            if ($data->training_pipeline){
+                                return "Yes";
+                            }else{
+                                return "NO";
+                            }
+                        }
+                    ],
+                    [
+                        'attribute' => 'leadership_edge',
+                        'label' => 'Leadership Edge',
+                        'value' => function($data){
+                            if ($data->leadership_edge){
+                                return "Yes";
+                            }else{
+                                return "NO";
+                            }
+                        }
+                    ],
+                    [
+                        'attribute'=>'created_by',
+                        'value' => 'createdBy.username'
+                    ],
+//                    'updated_at',
+//                    'created_at',
+                    [
+                        'class' => \common\widgets\ActionColumn::class,
+                        'template' => '{view}{delete}',
+                    ],
                 ],
             ]); ?>
     

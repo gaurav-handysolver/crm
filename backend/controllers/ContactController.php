@@ -63,7 +63,7 @@ class ContactController extends Controller
      */
     public function actionCreate()
     {
-        phpinfo(); die();
+//        phpinfo(); die();
         $model = new Contact();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
