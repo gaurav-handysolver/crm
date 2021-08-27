@@ -46,6 +46,7 @@ class ContactController extends ActiveController
         $conJson = (array) \json_decode($post);
 
         $contact= new Contact();
+        $contact->code = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',ceil(6/strlen($x)))),1,6);
         $contact->firstname= $conJson['firstname'];
         $contact->lastname= $conJson['lastname'];
         $contact->company= $conJson['company'];
@@ -63,18 +64,10 @@ class ContactController extends ActiveController
 
         $realImage = base64_decode($conJson['image']);
         if (!empty($realImage) ){
-
-
             $myfile = fopen(Yii::getAlias('@storage').'/web/source'.'/'.$contact->email.'.jpeg',"a") or die("Unable to open location for log file !");
-//            $txt = "Log details goes here ...";
             fwrite($myfile, $realImage);
             fclose($myfile);
             $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->email.'.jpeg',true);
-
-
-//            if(file_put_contents(Yii::getAlias('@storage').'/web/source'.'/'.$contact->email.'.jpeg',$realImage,LOCK_EX | FILE_APPEND)){
-//                $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->email.'.jpeg',true);
-//            }
         }
 
 
@@ -94,12 +87,12 @@ class ContactController extends ActiveController
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionUpdate($id)
+    public function actionUpdate($code)
     {
         $post = file_get_contents("php://input");
         $conJson = (array) \json_decode($post);
 
-        $contact = $this->findModel($id);
+        $contact =Contact::find()->where(['code'=>$code])->one();
         $contact->firstname= $conJson['firstname'];
         $contact->lastname= $conJson['lastname'];
         $contact->company= $conJson['company'];
@@ -140,9 +133,3 @@ class ContactController extends ActiveController
 
     }
 }
-
-//
-//// The first method
-//    $post = $GLOBALS['HTTP_RAW_POST_DATA'];
-//// The second method
-//    $post = file_get_contents("php://input");

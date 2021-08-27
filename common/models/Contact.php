@@ -26,6 +26,7 @@ use Yii;
  * @property int|null $training_pipeline
  * @property int|null $leadership_edge
  * @property int|null $created_by
+ * @property int|null $code
  * @property string $updated_at
  * @property string $created_at
  *
@@ -55,6 +56,7 @@ class Contact extends \yii\db\ActiveRecord
             [['notes','address'], 'string'],
             [['imageUrl'], 'file'], //extension=>'jpg,png
             [['mobile_number'], 'string', 'max' => 20],
+            [['code'],'integer','max' => 10],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
     }
@@ -66,6 +68,7 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common\models', 'ID'),
+            'code' => Yii::t('common\models', 'Code'),
             'firstname' => Yii::t('common\models', 'Firstname'),
             'lastname' => Yii::t('common\models', 'Lastname'),
             'email' => Yii::t('common\models', 'Email'),

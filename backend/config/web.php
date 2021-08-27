@@ -2,7 +2,7 @@
 $config = [
     'homeUrl' => Yii::getAlias('@backendUrl'),
     'controllerNamespace' => 'backend\controllers',
-    'defaultRoute' => 'timeline-event/index',
+    'defaultRoute' => 'contact/index',
     'components' => [
         'errorHandler' => [
             'errorAction' => 'site/error',

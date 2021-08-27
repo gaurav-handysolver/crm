@@ -104,6 +104,9 @@ $this->title = $model->firstname." ".$model->lastname;
                     'notes',
                     [
                         'attribute'=>'created_by',
+                        'value' => function($model){
+                            return $model->createdBy->username;
+                        },
                     ],
                     'updated_at:datetime',
                     'created_at:datetime',
