@@ -133,6 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute'=>'created_by',
                         'value' => 'createdBy.username'
                     ],
+                    'code',
 //                    'updated_at',
 //                    'created_at',
                     [

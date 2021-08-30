@@ -25,6 +25,7 @@ class ContactController extends ActiveController
         unset($actions['index']);
         unset($actions['create']);
         unset($actions['update']);
+        unset($actions['view']);
         return $actions;
     }
 
@@ -37,16 +38,22 @@ class ContactController extends ActiveController
         return $activeData;
     }
 
+    public function actionView($code)
+    {
+        return Contact::find()->where(['code'=>$code])->one();
+    }
+
 
     public function actionCreate()
     {
+        $code = strtolower(substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',ceil(6/strlen($x)))),1,6));
 
 //        ini_set("memory_limit","50M");
         $post = file_get_contents("php://input");
         $conJson = (array) \json_decode($post);
 
         $contact= new Contact();
-        $contact->code = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',ceil(6/strlen($x)))),1,6);
+        $contact->code= $code;
         $contact->firstname= $conJson['firstname'];
         $contact->lastname= $conJson['lastname'];
         $contact->company= $conJson['company'];
@@ -64,10 +71,10 @@ class ContactController extends ActiveController
 
         $realImage = base64_decode($conJson['image']);
         if (!empty($realImage) ){
-            $myfile = fopen(Yii::getAlias('@storage').'/web/source'.'/'.$contact->email.'.jpeg',"a") or die("Unable to open location for log file !");
+            $myfile = fopen(Yii::getAlias('@storage').'/web/source'.'/'.$contact->code.'.jpeg',"a") or die("Unable to open location for log file !");
             fwrite($myfile, $realImage);
             fclose($myfile);
-            $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->email.'.jpeg',true);
+            $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->code.'.jpeg',true);
         }
 
 
@@ -114,11 +121,11 @@ class ContactController extends ActiveController
 
         if (!empty($realImage) ){
             $contact->imageUrl = "";
-            $myfile = fopen(Yii::getAlias('@storage').'/web/source'.'/'.$contact->email.'.jpeg',"w+") or die("Unable to open location for log file !");
+            $myfile = fopen(Yii::getAlias('@storage').'/web/source'.'/'.$contact->code.'.jpeg',"w+") or die("Unable to open location for log file !");
 //            $txt = "Log details goes here ...";
             fwrite($myfile, $realImage);
             fclose($myfile);
-            $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->email.'.jpeg',true);
+            $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->code.'.jpeg',true);
         }else{
             $contact->imageUrl = null;
 
