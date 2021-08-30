@@ -56,7 +56,7 @@ class Contact extends \yii\db\ActiveRecord
             [['notes','address'], 'string'],
             [['imageUrl'], 'file'], //extension=>'jpg,png
             [['mobile_number'], 'string', 'max' => 20],
-            [['code'],'integer','max' => 10],
+            [['code'],'string'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
     }
@@ -116,12 +116,12 @@ class Contact extends \yii\db\ActiveRecord
         $vcard->addAddress($this->address);
 //        $vcard->addLabel('street, worktown, workpostcode Belgium');
         $vcard->addURL($this->website);
-        $vcard->addNote($this->notes);
+//        $vcard->addNote($this->notes);
 
         // return vcard as a string
         //    return $vcard->getOutput();
 
-        $vcard->setFilename($this->id,true);
+        $vcard->setFilename($this->code,true);
         // return vcard as a download
 //        return $vcard->download();
 
