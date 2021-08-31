@@ -5,6 +5,7 @@ namespace backend\controllers;
 use Yii;
 use common\models\Contact;
 use backend\models\search\ContactSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -87,6 +88,33 @@ class ContactController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+
+
+
+    public function actionUpdateContact($code)
+    {
+        $this->layout='businesscard';
+        $model =Contact::find()->where(['code'=>$code])->one();
+
+        if ($model->load(Yii::$app->request->post())) {
+
+//            $model->imageUrl="";
+//            $model->imageUrl = UploadedFile::getInstance($model,'imageUrl');
+//            $Image_path = '/storage/web/source'.'/'.$model->code.'.jpeg';
+//            $model->imageUrl->saveAs(Yii::getAlias('@storage').'/web/source'.'/'.$model->code.'.jpeg',"w+");
+//            $model->imageUrl = Url::to($Image_path,true);
+
+            $model->save();
+            return $this->render('contact_view', [
+                'model' => Contact::find()->where(['code'=>$code])->one(),
+            ]);
+        }
+
         return $this->render('update', [
             'model' => $model,
         ]);
