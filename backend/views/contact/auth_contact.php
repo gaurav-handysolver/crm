@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <form name="form" action="" method="post">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Email address</label>
-                                <input type="email" class="form-control" name="email_id" aria-describedby="emailHelp" placeholder="Enter email">
+                                <input type="email" class="form-control" name="email_id" aria-describedby="emailHelp" placeholder="Enter email" oninput="this.value = this.value.toLowerCase()">
                             </div>
                         </form>
                     </div>
