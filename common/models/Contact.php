@@ -96,7 +96,6 @@ class Contact extends \yii\db\ActiveRecord
         parent::afterSave($insert, $changedAttributes);
 
         $vcard = new VCard( );
-        // define variables
         $firstname = $this->firstname;
         $lastname = $this->lastname;
         $additional = '';
@@ -114,20 +113,9 @@ class Contact extends \yii\db\ActiveRecord
         $vcard->addRole('');
         $vcard->addEmail($this->email);
         $vcard->addPhoneNumber($this->mobile_number, 'PREF;WORK');
-//        $vcard->addPhoneNumber(123456789, 'WORK');
         $vcard->addAddress($this->address);
-//        $vcard->addLabel('street, worktown, workpostcode Belgium');
         $vcard->addURL($this->website);
-//        $vcard->addNote($this->notes);
-
-        // return vcard as a string
-        //    return $vcard->getOutput();
-
         $vcard->setFilename($this->code,true);
-        // return vcard as a download
-//        return $vcard->download();
-
-//         save vcard on disk
         $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
         return $vcard->save();
     }

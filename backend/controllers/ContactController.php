@@ -114,10 +114,10 @@ class ContactController extends Controller
      * @param $code
      * @return string
      */
-    public function actionUpdateContact($code)
+    public function actionUpdateContact($code,$email)
     {
         $this->layout='businesscard';
-        $model =Contact::find()->where(['code'=>$code])->one();
+        $model =Contact::find()->where(['code'=>$code])->andWhere(['email'=>$email])->one();
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -152,9 +152,9 @@ class ContactController extends Controller
         $model =Contact::find()->where(['code'=>$code])->one();
         if(Yii::$app->request->isPost){
             if ($model->email == $email) {
-                return $this->redirect(['update-contact','code'=>$code]);
+                return $this->redirect(['update-contact','code'=>$code,'email'=>$email]);
             } else {
-                Yii::$app->session->setFlash('error', "Please Enter valid Email ");
+                Yii::$app->session->setFlash('error', "Please enter a valid email address. ");
                 return $this->render('auth_contact',['model' => $model,]);
             }
         }

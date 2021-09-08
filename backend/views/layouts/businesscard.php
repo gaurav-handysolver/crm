@@ -53,7 +53,7 @@ $keyStorage = Yii::$app->keyStorage;
     ]),
 ])?>
 <?php $this->beginBody() ?>
-<div class="notefication">
+<div class="col-md-12">
     <?php if (Yii::$app->session->hasFlash('success')): ?>
         <div class="alert alert-success alert-dismissable">
             <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
@@ -62,7 +62,7 @@ $keyStorage = Yii::$app->keyStorage;
     <?php endif; ?>
 
     <?php if (Yii::$app->session->hasFlash('error')): ?>
-        <div class="alert alert-danger alert-dismissable">
+        <div class=" alert alert-danger alert-dismissable">
             <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
             <?= Yii::$app->session->getFlash('error') ?>
         </div>
