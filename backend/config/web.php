@@ -67,6 +67,12 @@ $config = [
                 'roles' => ['?'],
             ],
             [
+                'controllers' => ['contact'],
+                'allow' => true,
+                'actions'=>['auth-contact','update-contact','view-contact','image-delete'],
+                'roles' => ['?'],
+            ],
+            [
                 'controllers' => ['user'],
                 'allow' => true,
                 'roles' => ['administrator'],

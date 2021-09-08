@@ -49,12 +49,14 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             [['email'], 'unique'],
+            [['email'], 'email'],
+            [['firstname','email'],'required'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],
             [['website'], 'string', 'max' => 512],
             [['notes','address'], 'string'],
-            [['imageUrl'], 'file'], //extension=>'jpg,png
+            [['imageUrl'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpeg,png,jpg'],
             [['mobile_number'], 'string', 'max' => 20],
             [['code'],'string'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],

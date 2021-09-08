@@ -94,8 +94,26 @@ class ContactController extends Controller
     }
 
 
+    public function actionImageDelete($code)
+    {
+        $contact = Contact::find()->where(['code'=>$code])->one();
+//        $contact->imageUrl = null;
+        if (file_exists(Yii::getAlias('@storage') . '/web/source' . '/' . $contact->code . '.jpeg')){
+
+            if (unlink(Yii::getAlias('@storage') . '/web/source' . '/' . $contact->code . '.jpeg')){
+                $contact->imageUrl = '';
+                $contact->save();
+                return true;
+            }
+        }
+        return false;
+    }
 
 
+    /**
+     * @param $code
+     * @return string
+     */
     public function actionUpdateContact($code)
     {
         $this->layout='businesscard';
@@ -103,20 +121,52 @@ class ContactController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
 
-//            $model->imageUrl="";
-//            $model->imageUrl = UploadedFile::getInstance($model,'imageUrl');
-//            $Image_path = '/storage/web/source'.'/'.$model->code.'.jpeg';
-//            $model->imageUrl->saveAs(Yii::getAlias('@storage').'/web/source'.'/'.$model->code.'.jpeg',"w+");
-//            $model->imageUrl = Url::to($Image_path,true);
+            $logoFile = UploadedFile::getInstance($model, 'imageUrl');
+            if (!empty($logoFile)) {
 
-            $model->save();
-            return $this->render('contact_view', [
-                'model' => Contact::find()->where(['code'=>$code])->one(),
-            ]);
+                $uploadPath = Yii::getAlias('@storage') . '/web/source' . '/' . $model->code . '.jpeg';
+                $upload = $logoFile->saveAs($uploadPath);
+
+                $Image_path = '/source'.'/'.$model->code.'.jpeg';
+                $url = Yii::getAlias('@storageUrl') . $Image_path;
+
+                if ($upload) {
+                    $model->imageUrl = $url;
+                    $model->save(false);
+                }
+            } else {
+                $model->imageUrl = $model->getOldAttribute('imageUrl');
+                $model->save(false);
+            }
+            return $this->redirect(['view-contact','code'=>$code]);
         }
-
         return $this->render('update', [
             'model' => $model,
+        ]);
+    }
+
+    public function actionAuthContact($code)
+    {
+        $email = Yii::$app->request->post('email_id');
+        $this->layout = 'businesscard';
+        $model =Contact::find()->where(['code'=>$code])->one();
+        if(Yii::$app->request->isPost){
+            if ($model->email == $email) {
+                return $this->redirect(['update-contact','code'=>$code]);
+            } else {
+                Yii::$app->session->setFlash('error', "Please Enter valid Email ");
+                return $this->render('auth_contact',['model' => $model,]);
+            }
+        }
+        return $this->render('auth_contact',['model' => $model,]);
+    }
+
+
+    public function actionViewContact($code){
+
+        $this->layout='businesscard';
+        return $this->render('contact_view', [
+            'model' => Contact::find()->where(['code'=>$code])->one(),
         ]);
     }
 

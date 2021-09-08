@@ -9,6 +9,7 @@
 
 <?php
 use backend\assets\BackendAsset;
+use yii\bootstrap4\Alert;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 
@@ -37,10 +38,8 @@ $keyStorage = Yii::$app->keyStorage;
 </head>
 
 <nav class="navbar navbar-dark bg-dark">
-    <span class="mx-auto navbar-brand mb-0 h1">NFC-CRM</span>
+    <span class="mx-auto navbar-brand mb-0 h1">Digital Business Card</span>
 </nav>
-<br/>
-<br/>
 <br/>
 <?php echo Html::beginTag('body', [
     'class' => implode(' ', [
@@ -54,6 +53,21 @@ $keyStorage = Yii::$app->keyStorage;
     ]),
 ])?>
 <?php $this->beginBody() ?>
+<div class="notefication">
+    <?php if (Yii::$app->session->hasFlash('success')): ?>
+        <div class="alert alert-success alert-dismissable">
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+            <?= Yii::$app->session->getFlash('success') ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (Yii::$app->session->hasFlash('error')): ?>
+        <div class="alert alert-danger alert-dismissable">
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+            <?= Yii::$app->session->getFlash('error') ?>
+        </div>
+    <?php endif; ?>
+</div>
 <?php echo $content ?>
 <?php $this->endBody() ?>
 <?php echo Html::endTag('body') ?>
