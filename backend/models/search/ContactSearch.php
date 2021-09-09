@@ -70,7 +70,7 @@ class ContactSearch extends Contact
 
         $query->andFilterWhere(['like', 'firstname', $this->firstname])
             ->andFilterWhere(['like', 'lastname', $this->lastname])
-            ->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'tbl_contact.email', $this->email])
             ->andFilterWhere(['like', 'company', $this->company])
             ->andFilterWhere(['like', 'website', $this->website])
             ->andFilterWhere(['like', 'mobile_number', $this->mobile_number])
