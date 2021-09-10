@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /**
  * @var yii\web\View $this
@@ -20,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="card-body p-0">
             <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-    
+
             <?php echo GridView::widget([
                 'layout' => "{items}\n{pager}",
                 'options' => [
@@ -44,28 +45,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => 'imageUrl',
                         'format' => ['image',['width'=>'50','height'=>'50']],
                     ],
-//                    [
-//                        'attribute' => 'firstname',
-//                        'label' => 'Name',
-//                        'value' => function($data){
-//                            return $data->firstname." ".$data->lastname;
-//                        },
-//                    ],
                     'firstname',
                     'lastname',
                     'email:email',
-//                    'company',
                     [
                         'attribute' => 'company',
                         'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
                     ],
-//                    'website',
                     [
                         'attribute' => 'website',
                         'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
                     ],
                     'mobile_number',
-//                    'birthday',
                     [
                         'attribute' => 'address',
                         'contentOptions' => ['style' => 'width:200px; white-space: normal;'],
@@ -134,15 +125,33 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => 'createdBy.username'
                     ],
                     'code',
-//                    'updated_at',
-//                    'created_at',
                     [
                         'class' => \common\widgets\ActionColumn::class,
-                        'template' => '{view}{delete}',
+                        'template' => '{view} {update} {copy} {delete}',
+                        'buttons' => [
+                            'copy' => function($url, $model, $key){
+                                return Html::button('<i class="copy-to-clipboard fa fa-clipboard" data-url="'.Url::to(['contact/auth-contact', 'code' => $model->code],true).'" id="copyBtn" "></i>',['class'=>'btn btn-primary btn-xs','title'=>'Copy Link']);
+                            },
+
+                        ],
+                        'urlCreator' => function ($action, $model, $key, $index) {
+                            if ($action === 'view') {
+                                $url = Url::to(['contact/view', 'code' => $model->code]);
+                                return $url;
+                            }
+                            if ($action === 'delete') {
+                                $url = Url::to(['contact/delete', 'id' => $model->id]);
+                                return $url;
+                            }
+                            if ($action === 'update') {
+                                $url = Url::to(['contact/update-contact', 'code' => $model->code,'email'=>$model->email]);
+                                return $url;
+                            }
+                        }
                     ],
                 ],
             ]); ?>
-    
+
         </div>
         <div class="card-footer">
             <?php echo getDataProviderSummary($dataProvider) ?>
@@ -150,3 +159,16 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 </div>
+
+<script>
+
+    document.querySelectorAll(".copy-to-clipboard").forEach(button => {
+        button.addEventListener('click', (event) => {
+        console.log(event.target.dataset.url);
+    var link = event.target.dataset.url;
+    navigator.clipboard.writeText(link);
+    alert("Link Copied");
+    })
+    })
+
+</script>

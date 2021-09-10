@@ -50,10 +50,10 @@ class ContactController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($code)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => Contact::find()->where(['code'=>$code])->one()
         ]);
     }
 
@@ -81,18 +81,6 @@ class ContactController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
 
     public function actionImageDelete($code)
     {
@@ -116,7 +104,9 @@ class ContactController extends Controller
      */
     public function actionUpdateContact($code,$email)
     {
-        $this->layout='businesscard';
+        if (Yii::$app->user->isGuest){
+            $this->layout='businesscard';
+        }
         $model =Contact::find()->where(['code'=>$code])->andWhere(['email'=>strtolower($email)])->one();
 if(!empty($model)){
     if ($model->load(Yii::$app->request->post())) {
@@ -138,7 +128,12 @@ if(!empty($model)){
             $model->imageUrl = $model->getOldAttribute('imageUrl');
             $model->save(false);
         }
-        return $this->redirect(['view-contact','code'=>$code]);
+
+        if (Yii::$app->user->isGuest){
+            return $this->redirect(['view-contact','code'=>$code]);
+        }else{
+            return $this->redirect(['view', 'code' => $model->code]);
+        }
     }
 }else{
     Yii::$app->session->setFlash('error', "Please enter a valid email address. ");

@@ -157,7 +157,7 @@ $logEntries[] = [
         <a href="/" class="brand-link text-center <?php echo $keyStorage->get('adminlte.brand-text-small') ? 'text-sm' : null ?>">
             <!-- <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
                 style="opacity: .8"> -->
-            <span class="brand-text font-weight-bold"> LFC -CRM </span>
+            <span class="brand-text font-weight-bold"> LFC-CRM </span>
         </a>
         <!-- /brand logo -->
 
@@ -429,8 +429,7 @@ $logEntries[] = [
 
     <!-- footer -->
     <footer class="main-footer <?php echo $keyStorage->get('adminlte.footer-small-text') ? 'text-sm' : null ?>">
-        <strong>&copy; My Company <?php echo date('Y') ?></strong>
-        <div class="float-right d-none d-sm-inline-block"><?php echo Yii::powered() ?></div>
+        <strong>&copy; Looking Forward Consulting <?php echo date('Y') ?></strong>
     </footer>
     <!-- /footer -->
 

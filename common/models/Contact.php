@@ -49,7 +49,7 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             [['email'], 'unique'],
-            [['email','filter', 'filter'=>'strtolower'], 'email'],
+            [['email'], 'email'],
             [['firstname','email'],'required'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
