@@ -91,6 +91,18 @@ class Contact extends \yii\db\ActiveRecord
             'created_at' => Yii::t('common\models', 'Created At'),
         ];
     }
+
+    /**
+     * Convert email to lowercase before save
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        $this->email = strtolower($this->email);
+        return parent::beforeSave($insert);
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
