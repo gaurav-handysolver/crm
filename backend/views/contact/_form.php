@@ -13,7 +13,7 @@ use yii\helpers\Url;
 ?>
 
 <div class="contact-form">
-    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true,'options' => ['enctype' => 'multipart/form-data']]); ?>
     <div class="form form-vertical ">
         <div class="card-body row">
 <!--            --><?php //echo $form->errorSummary($model); ?>
@@ -85,6 +85,11 @@ use yii\helpers\Url;
                         </div>
                     </div>
 
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <?php echo Yii::$app->user->isGuest == false ? $form->field($model, 'code')->textInput(['maxlength' => true]) : '' ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

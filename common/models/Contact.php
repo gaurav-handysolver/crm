@@ -48,9 +48,9 @@ class Contact extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['email'], 'unique'],
+            [['email','code'], 'unique'],
             [['email'], 'email'],
-            [['firstname','email'],'required'],
+            [['firstname','email','code'],'required'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],
@@ -58,7 +58,6 @@ class Contact extends \yii\db\ActiveRecord
             [['notes','address'], 'string'],
             [['imageUrl'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpeg,png,jpg'],
             [['mobile_number'], 'string', 'max' => 20],
-            [['code'],'string'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
     }

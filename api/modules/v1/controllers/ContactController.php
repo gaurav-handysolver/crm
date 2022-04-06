@@ -100,6 +100,7 @@ class ContactController extends ActiveController
         $conJson = (array) \json_decode($post);
 
         $contact =Contact::find()->where(['code'=>$code])->one();
+        $contact->code = $conJson['code'];
         $contact->firstname= $conJson['firstname'];
         $contact->lastname= $conJson['lastname'];
         $contact->company= $conJson['company'];
@@ -132,7 +133,7 @@ class ContactController extends ActiveController
         }
 
 
-        if (!$contact->save(false)){
+        if (!$contact->save()){
             return $contact->getErrors();
         }
 

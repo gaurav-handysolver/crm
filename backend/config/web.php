@@ -69,7 +69,7 @@ $config = [
             [
                 'controllers' => ['contact'],
                 'allow' => true,
-                'actions'=>['auth-contact','update-contact','view-contact','image-delete'],
+                'actions'=>['auth-contact','update-contact','view-contact','image-delete','contact-code-url'],
                 'roles' => ['?'],
             ],
             [

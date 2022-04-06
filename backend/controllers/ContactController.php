@@ -5,11 +5,16 @@ namespace backend\controllers;
 use Yii;
 use common\models\Contact;
 use backend\models\search\ContactSearch;
+use yii\base\ErrorException;
+use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 use yii\web\UploadedFile;
+use JeroenDesloovere\VCard\VCard;
+use yii\widgets\ActiveForm;
 
 /**
  * ContactController implements the CRUD actions for Contact model.
@@ -100,7 +105,7 @@ class ContactController extends Controller
 
     /**
      * @param $code
-     * @return string
+     * @return array|string|Response
      */
     public function actionUpdateContact($code,$email)
     {
@@ -108,26 +113,30 @@ class ContactController extends Controller
             $this->layout='businesscard';
         }
         $model =Contact::find()->where(['code'=>$code])->andWhere(['email'=>strtolower($email)])->one();
-if(!empty($model)){
-    if ($model->load(Yii::$app->request->post())) {
-
-        $logoFile = UploadedFile::getInstance($model, 'imageUrl');
-        if (!empty($logoFile)) {
-
-            $uploadPath = Yii::getAlias('@storage') . '/web/source' . '/' . $model->code . '.jpeg';
-            $upload = $logoFile->saveAs($uploadPath);
-
-            $Image_path = '/source'.'/'.$model->code.'.jpeg';
-            $url = Yii::getAlias('@storageUrl') . $Image_path;
-
-            if ($upload) {
-                $model->imageUrl = $url;
-                $model->save(false);
-            }
-        } else {
-            $model->imageUrl = $model->getOldAttribute('imageUrl');
-            $model->save(false);
+//        for Input Validation : Start
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
         }
+//        for Input Validation : End
+        if(!empty($model)){
+            if ($model->load(Yii::$app->request->post())) {
+                $logoFile = UploadedFile::getInstance($model, 'imageUrl');
+                if (!empty($logoFile)) {
+                    $uploadPath = Yii::getAlias('@storage') . '/web/source' . '/' . $model->code . '.jpeg';
+                    $upload = $logoFile->saveAs($uploadPath);
+
+                    $Image_path = '/source'.'/'.$model->code.'.jpeg';
+                    $url = Yii::getAlias('@storageUrl') . $Image_path;
+
+                    if ($upload) {
+                        $model->imageUrl = $url;
+                        $model->save();
+                    }
+                } else {
+                    $model->imageUrl = $model->getOldAttribute('imageUrl');
+                    $model->save();
+                }
 
         if (Yii::$app->user->isGuest){
             return $this->redirect(['view-contact','code'=>$code]);
@@ -159,6 +168,44 @@ if(!empty($model)){
             }
         }
         return $this->render('auth_contact',['model' => $model,]);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionContactCodeUrl()
+    {
+        $this->layout = 'businesscard';
+        $code = Yii::$app->request->post('code');
+        $model =Contact::find()->where(['code'=>$code])->one();
+        if(Yii::$app->request->isPost){
+            if(isset($model['code']) == $code){
+                $vcard = new VCard( );
+                $firstname = $model['firstname'];
+                $lastname = $model['lastname'];
+                $additional = '';$prefix = '';$suffix = '';
+                // add personal data
+                $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+                if (!empty($model['imageUrl'])){
+                    $vcard->addPhoto($model['imageUrl'],true);
+                }else{
+                    $vcard->addPhoto('https://handysolver.myhandydash.com/backend/web/images/male.svg',true);
+                }
+                $vcard->addCompany($model['company']);
+                $vcard->addEmail($model['email']);
+                $vcard->addPhoneNumber($model['mobile_number'], 'PREF;WORK');
+//                $vcard->addAddress($model['address']);
+                $vcard->addURL($model['website']);
+                $vcard->setFilename($model['firstname'],true);
+                $vcard->download();
+                return $this->render('contact_url');
+                //return $this->refresh(); // <---- key point is here (prevent form data from resending on refresh)
+            } else {
+                Yii::$app->session->setFlash('error', "Please enter a valid Code. ");
+                return $this->render('contact_url');
+            }
+        }
+        return $this->render('contact_url');
     }
 
 
