@@ -28,6 +28,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         We offer custom learning solutions focus on any technical or essential skills topic. For more information, visit us at <a href="https://www.lookingforwardconsulting.com">https://www.lookingforwardconsulting.com</a>
     </p>
+    <p>
+        Leadership Development training programs for Managers <a href="https://www.leadershipedge.live">https://www.leadershipedge.live</a>
+    </p>
+    <p>
+        Organizational Leadership development Training Consultant <a href="https://www.lookingforwardconsulting.com">https://www.lookingforwardconsulting.com</a>
+    </p>
 </div>
 
 <div class="login-box mx-auto">
