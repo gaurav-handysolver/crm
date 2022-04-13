@@ -53,7 +53,12 @@ class ContactController extends ActiveController
         $conJson = (array) \json_decode($post);
 
         $contact= new Contact();
-        $contact->code= $code;
+        if($conJson['code'] == null){
+            $contact->code= $code;
+        }else{
+            $contact->code= $conJson['code'];
+        }
+
         $contact->firstname= $conJson['firstname'];
         $contact->lastname= $conJson['lastname'];
         $contact->company= $conJson['company'];
@@ -78,7 +83,7 @@ class ContactController extends ActiveController
         }
 
 
-        if (!$contact->save(false)){
+        if (!$contact->save()){
             return $contact->getErrors();
         }
 

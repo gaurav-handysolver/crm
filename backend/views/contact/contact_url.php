@@ -23,20 +23,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="container-fluid p-5">
     <p>
-        Leadership Edge offer unlimited live virtual classes divided into short segments with practical application, including additional support from a leadership coach, all for one low subscription price. Visit us at <a href="https://www.leadershipedge.live">https://www.leadershipedge.live</a>.
+        Leadership Edge offer unlimited live virtual classes divided into short segments with practical application, including additional support from a leadership coach, all for one low subscription price. Visit us at <a href="https://www.leadershipedge.live">https://www.leadershipedge.live</a>
     </p>
     <p>
         We offer custom learning solutions focus on any technical or essential skills topic. For more information, visit us at <a href="https://www.lookingforwardconsulting.com">https://www.lookingforwardconsulting.com</a>
     </p>
-    <p>
-        Leadership Development training programs for Managers <a href="https://www.leadershipedge.live">https://www.leadershipedge.live</a>
-    </p>
-    <p>
-        Organizational Leadership development Training Consultant <a href="https://www.lookingforwardconsulting.com">https://www.lookingforwardconsulting.com</a>
-    </p>
 </div>
 
-<div class="login-box mx-auto">
+<div class="login-box mx-auto mb-5">
 
     <div class="card">
         <div class="card-body login-card-body">
@@ -58,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </form>
                     </div>
                     <div class="text-center card-footer">
-                        <?php echo Html::submitButton(Yii::t('backend', 'Verification'), ['class' => 'btn btn-primary','id'=>'code-btn']) ?>
+                        <?php echo Html::submitButton(Yii::t('backend', 'Get Contact'), ['class' => 'btn btn-primary','id'=>'code-btn']) ?>
                     </div>
             </div>
             <?php ActiveForm::end(); ?>
