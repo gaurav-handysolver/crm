@@ -176,34 +176,41 @@ class ContactController extends Controller
     public function actionContactCodeUrl()
     {
         $this->layout = 'businesscard';
-        $code = Yii::$app->request->post('code');
-        $model =Contact::find()->where(['code'=>$code])->one();
-        if(Yii::$app->request->isPost){
-            if(isset($model['code']) == $code){
-                $vcard = new VCard( );
-                $firstname = $model['firstname'];
-                $lastname = $model['lastname'];
-                $additional = '';$prefix = '';$suffix = '';
-                // add personal data
-                $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
-                if (!empty($model['imageUrl'])){
-                    $vcard->addPhoto($model['imageUrl'],true);
-                }else{
-                    $vcard->addPhoto('https://handysolver.myhandydash.com/backend/web/images/male.svg',true);
-                }
-                $vcard->addCompany($model['company']);
-                $vcard->addEmail($model['email']);
-                $vcard->addPhoneNumber($model['mobile_number'], 'PREF;WORK');
+        if (Yii::$app->request->post('code') != null){
+            $code = Yii::$app->request->post('code');
+            $model =Contact::find()->where(['code'=>$code])->one();
+            if(Yii::$app->request->isPost) {
+                if (isset($model['code']) == $code) {
+                    $vcard = new VCard();
+                    $firstname = $model['firstname'];
+                    $lastname = $model['lastname'];
+                    $additional = '';
+                    $prefix = '';
+                    $suffix = '';
+                    // add personal data
+                    $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+                    if (!empty($model['imageUrl'])) {
+                        $vcard->addPhoto($model['imageUrl'], true);
+                    } else {
+                        $vcard->addPhoto('https://handysolver.myhandydash.com/backend/web/images/male.svg', true);
+                    }
+                    $vcard->addCompany($model['company']);
+                    $vcard->addEmail($model['email']);
+                    $vcard->addPhoneNumber($model['mobile_number'], 'PREF;WORK');
 //                $vcard->addAddress($model['address']);
-                $vcard->addURL($model['website']);
-                $vcard->setFilename($model['firstname'],true);
-                $vcard->download();
-                return $this->render('contact_url');
-                //return $this->refresh(); // <---- key point is here (prevent form data from resending on refresh)
-            } else {
-                Yii::$app->session->setFlash('error', "Please enter a valid Code. ");
-                return $this->render('contact_url');
+                    $vcard->addURL($model['website']);
+                    $vcard->setFilename($model['firstname'], true);
+                    $vcard->download();
+//                return $this->render('contact_url',['model' => $model,]);
+                    return $this->refresh(); // <---- key point is here (prevent form data from resending on refresh)
+                } else {
+                    Yii::$app->session->setFlash('error', "Please enter a valid Code. ");
+                    return $this->render('contact_url');
+                }
             }
+        }else{
+//            Yii::$app->session->setFlash('error', "Please enter Code. ");
+            return $this->render('contact_url');
         }
         return $this->render('contact_url');
     }

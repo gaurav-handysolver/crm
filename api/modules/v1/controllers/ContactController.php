@@ -32,7 +32,7 @@ class ContactController extends ActiveController
     public function actionIndex()
     {
         $activeData = new ActiveDataProvider([
-            'query' => Contact::find(),
+            'query' => Contact::find()->orderBy('firstname'),
             'pagination' => false
         ]);
         return $activeData;
