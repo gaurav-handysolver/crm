@@ -56,7 +56,7 @@ class ContactController extends ActiveController
         if($conJson['code'] == null){
             $contact->code= $code;
         }else{
-            $contact->code= $conJson['code'];
+            $contact->code= strtolower($conJson['code']);
         }
 
         $contact->firstname= $conJson['firstname'];
