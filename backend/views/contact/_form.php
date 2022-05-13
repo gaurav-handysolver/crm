@@ -85,6 +85,30 @@ use yii\helpers\Url;
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <?php echo $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <?php echo $form->field($model, 'state')->textInput(['maxlength' => true]) ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <?php echo $form->field($model, 'country')->textInput(['maxlength' => true]) ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <?php echo $form->field($model, 'pincode')->textInput(['maxlength' => true]) ?>
+                        </div>
+                    </div>
+
                     <div class="col-md-12">
                         <div class="form-group">
                             <?php echo Yii::$app->user->isGuest == false ? $form->field($model, 'code')->textInput(['maxlength' => true]) : '' ?>
