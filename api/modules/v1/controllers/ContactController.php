@@ -60,7 +60,6 @@ class ContactController extends ActiveController
         return $contact;
     }
 
-
     public function actionCreate()
     {
         $code = strtolower(substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',ceil(6/strlen($x)))),1,6));
@@ -76,28 +75,38 @@ class ContactController extends ActiveController
             $contact->code= strtolower($conJson['code']);
         }
 
-        $contact->firstname= $conJson['firstname'];
-        $contact->lastname= $conJson['lastname'];
-        $contact->company= $conJson['company'];
-        $contact->email= $conJson['email'];
-        $contact->mobile_number= $conJson['mobile_number'];
-        $contact->website= $conJson['website'];
-        $contact->notes= $conJson['notes'];
-        $contact->address= $conJson['address'];
-        $contact->pollguru= $conJson['pollguru'];
-        $contact->buzz= $conJson['buzz'];
-        $contact->learning_arcade= $conJson['learning_arcade'];
-        $contact->training_pipeline= $conJson['training_pipeline'];
-        $contact->leadership_edge= $conJson['leadership_edge'];
-        $contact->created_by= $conJson['created_by'];
-        $contact->city= $conJson['city'];
-        $contact->state= $conJson['state'];
-        $contact->country= $conJson['country'];
-        $contact->address_type= $conJson['address_type'];
-        $contact->pincode= $conJson['pincode'];
-        $contact->lead_id= $conJson['lead_id'];
+        if(!isset($conJson['firstname']) || !isset($conJson['email'])){
+            return [
+                'error' => "firstname and email must be passed as POST params"
+            ];
+        }
 
-        $realImage = base64_decode($conJson['image']);
+        $contact->firstname= $conJson['firstname'];
+        $contact->email= $conJson['email'];
+
+        $contact->lastname= $conJson['lastname'] ?? '';
+        $contact->company= $conJson['company'] ?? '';
+
+        $contact->mobile_number= $conJson['mobile_number'] ?? '';
+        $contact->website= $conJson['website'] ?? '';
+        $contact->notes= $conJson['notes'] ?? '';
+        $contact->address= $conJson['address'] ?? '';
+        $contact->pollguru= $conJson['pollguru'] ?? '';
+        $contact->buzz= $conJson['buzz'] ?? '';
+        $contact->learning_arcade= $conJson['learning_arcade'] ?? '';
+        $contact->training_pipeline= $conJson['training_pipeline'] ?? '';
+        $contact->leadership_edge= $conJson['leadership_edge'] ?? '';
+        $contact->city= $conJson['city'] ?? '';
+        $contact->state= $conJson['state'] ?? '';
+        $contact->country= $conJson['country'] ?? '';
+        $contact->address_type= $conJson['address_type'] ?? '';
+        $contact->pincode= $conJson['pincode'] ?? '';
+        $contact->lead_id= $conJson['lead_id'] ?? '';
+
+        if(isset($conJson['image'])){
+            $realImage = base64_decode($conJson['image']);
+        }
+
         if (!empty($realImage) ){
             $myfile = fopen(Yii::getAlias('@storage').'/web/source'.'/'.$contact->code.'.jpeg',"a") or die("Unable to open location for log file !");
             fwrite($myfile, $realImage);
@@ -105,13 +114,11 @@ class ContactController extends ActiveController
             $contact->imageUrl = Url::to('/storage/web/source'.'/'.$contact->code.'.jpeg',true);
         }
 
-
         if (!$contact->save()){
             return $contact->getErrors();
         }
 
         return $contact;
-
     }
 
     protected function findModel($id)
@@ -128,31 +135,45 @@ class ContactController extends ActiveController
         $conJson = (array) \json_decode($post);
 
         $contact =Contact::find()->where(['code'=>$code])->one();
+
+        if(!isset($contact)) {
+            return [
+                'error' => "Contact with passed code could not be found"
+            ];
+        }
+
+        if(!isset($conJson['code']) || !isset($conJson['firstname']) || !isset($conJson['email'])){
+            return [
+                'error' => "code, firstname and email must be passed as POST params"
+            ];
+        }
+
         $contact->code = $conJson['code'];
         $contact->firstname= $conJson['firstname'];
-        $contact->lastname= $conJson['lastname'];
-        $contact->company= $conJson['company'];
         $contact->email= $conJson['email'];
-        $contact->mobile_number= $conJson['mobile_number'];
-        $contact->website= $conJson['website'];
-        $contact->notes= $conJson['notes'];
-        $contact->address= $conJson['address'];
-        $contact->pollguru= $conJson['pollguru'];
-        $contact->buzz= $conJson['buzz'];
-        $contact->learning_arcade= $conJson['learning_arcade'];
-        $contact->training_pipeline= $conJson['training_pipeline'];
-        $contact->leadership_edge= $conJson['leadership_edge'];
-        $contact->city= $conJson['city'];
-        $contact->state= $conJson['state'];
-        $contact->country= $conJson['country'];
-        $contact->address_type= $conJson['address_type'];
-        $contact->pincode= $conJson['pincode'];
-        $contact->lead_id= $conJson['lead_id'];
 
-        $realImage = base64_decode($conJson['image']);
+        $contact->lastname= $conJson['lastname'] ?? '';
+        $contact->company= $conJson['company'] ?? '';
 
+        $contact->mobile_number= $conJson['mobile_number'] ?? '';
+        $contact->website= $conJson['website'] ?? '';
+        $contact->notes= $conJson['notes'] ?? '';
+        $contact->address= $conJson['address'] ?? '';
+        $contact->pollguru= $conJson['pollguru'] ?? '';
+        $contact->buzz= $conJson['buzz'] ?? '';
+        $contact->learning_arcade= $conJson['learning_arcade'] ?? '';
+        $contact->training_pipeline= $conJson['training_pipeline'] ?? '';
+        $contact->leadership_edge= $conJson['leadership_edge'] ?? '';
+        $contact->city= $conJson['city'] ?? '';
+        $contact->state= $conJson['state'] ?? '';
+        $contact->country= $conJson['country'] ?? '';
+        $contact->address_type= $conJson['address_type'] ?? '';
+        $contact->pincode= $conJson['pincode'] ?? '';
+        $contact->lead_id= $conJson['lead_id'] ?? '';
 
-
+        if(isset($conJson['image'])){
+            $realImage = base64_decode($conJson['image']);
+        }
 
         if (!empty($realImage) ){
             $contact->imageUrl = "";
@@ -172,6 +193,5 @@ class ContactController extends ActiveController
         }
 
         return $contact;
-
     }
 }
