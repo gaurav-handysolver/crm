@@ -27,6 +27,11 @@ use Yii;
  * @property int|null $leadership_edge
  * @property int|null $created_by
  * @property int|null $code
+ * @property string $city
+ * @property string $state
+ * @property string $country
+ * @property string $address_type
+ * @property string $pincode
  * @property string $updated_at
  * @property string $created_at
  *
