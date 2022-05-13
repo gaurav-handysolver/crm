@@ -58,7 +58,8 @@
     "yii2mod/yii2-swagger": "^1.1",
     "rmrevin/yii2-fontawesome": "^3.4",
     "kartik-v/yii2-widgets": "^3.4",
-    "jeroendesloovere/vcard": "^1.7"
+    "jeroendesloovere/vcard": "^1.7",
+    "aws/aws-sdk-php": "^3.222"
   },
   "require-dev": {
     "yiisoft/yii2-gii": "^2.0.0",

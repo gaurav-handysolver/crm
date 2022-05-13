@@ -69,7 +69,7 @@ class UserController extends Controller
     {
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post(), '') && $model->login()) {
-            return $model->getUser()->toArray(['id', 'username', 'access_token']);
+            return $model->getUser()->toArray(['id', 'username', 'access_token','onehash_token']);
         }
 
         Yii::$app->response->statusCode = 422;
