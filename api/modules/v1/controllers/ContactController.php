@@ -31,16 +31,33 @@ class ContactController extends ActiveController
 
     public function actionIndex()
     {
-        $activeData = new ActiveDataProvider([
+        /*$activeData = new ActiveDataProvider([
             'query' => Contact::find()->orderBy('firstname'),
             'pagination' => false
         ]);
-        return $activeData;
+
+        return $activeData;*/
+
+        $contacts = Contact::find()->orderBy('firstname')->all();
+
+        foreach($contacts as $contact) {
+            if(!empty($contact->imageUrl)) {
+                $contact->imageUrl .= '?nocache=' . time();
+            }
+        }
+
+        return $contacts;
     }
 
     public function actionView($code)
     {
-        return Contact::find()->where(['code'=>$code])->one();
+        $contact = Contact::find()->where(['code'=>$code])->one();
+
+        if(!empty($contact->imageUrl)) {
+            $contact->imageUrl .= '?nocache=' . time();
+        }
+
+        return $contact;
     }
 
 
