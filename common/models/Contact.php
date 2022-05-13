@@ -59,6 +59,7 @@ class Contact extends \yii\db\ActiveRecord
             [['imageUrl'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpeg,png,jpg'],
             [['mobile_number'], 'string', 'max' => 20],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
+            [['city', 'state', 'country', 'address_type', 'pincode'], 'string', 'max' => 255],
         ];
     }
 
@@ -88,6 +89,11 @@ class Contact extends \yii\db\ActiveRecord
             'created_by' => Yii::t('common\models', 'Created By'),
             'updated_at' => Yii::t('common\models', 'Updated At'),
             'created_at' => Yii::t('common\models', 'Created At'),
+            'city' => Yii::t('common\models', 'City'),
+            'state' => Yii::t('common\models', 'State'),
+            'country' => Yii::t('common\models', 'Country'),
+            'address_type' => Yii::t('common\models', 'Address Type'),
+            'pincode' => Yii::t('common\models', 'Pin Code'),
         ];
     }
 
