@@ -7,6 +7,9 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'assetManager' => [
+            'appendTimestamp' => YII_ENV_PROD,
+        ],
         'request' => [
             'cookieValidationKey' => env('BACKEND_COOKIE_VALIDATION_KEY'),
             'baseUrl' => env('BACKEND_BASE_URL'),
