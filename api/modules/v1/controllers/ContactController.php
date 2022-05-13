@@ -78,6 +78,7 @@ class ContactController extends ActiveController
         $contact->country= $conJson['country'];
         $contact->address_type= $conJson['address_type'];
         $contact->pincode= $conJson['pincode'];
+        $contact->lead_id= $conJson['lead_id'];
 
         $realImage = base64_decode($conJson['image']);
         if (!empty($realImage) ){
@@ -129,6 +130,7 @@ class ContactController extends ActiveController
         $contact->country= $conJson['country'];
         $contact->address_type= $conJson['address_type'];
         $contact->pincode= $conJson['pincode'];
+        $contact->lead_id= $conJson['lead_id'];
 
         $realImage = base64_decode($conJson['image']);
 
