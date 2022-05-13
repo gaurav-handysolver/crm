@@ -206,14 +206,14 @@ class ContactController extends Controller
                     );*/
 
                     $vcard->addAddress(
-                        "",
-                        "",
-                        $model->address ? $model->address: "",
-                        $model->city ? $model->city: "",
-                        $model->state ? $model->state: "",
-                        $model->pincode ? $model->pincode: "",
-                        $model->country ? $model->country: "",
-                        $model->address_type ? $model->address_type: ""
+                        '',
+                        '',
+                        $model->address ?? '',
+                        $model->city ?? '',
+                        $model->state ?? '',
+                        $model->pincode ?? '',
+                        $model->country ?? '',
+                        $model->address_type ?? ''
                     );
 
                     if (!empty($model['imageUrl'])) {
