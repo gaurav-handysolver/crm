@@ -73,6 +73,11 @@ class ContactController extends ActiveController
         $contact->training_pipeline= $conJson['training_pipeline'];
         $contact->leadership_edge= $conJson['leadership_edge'];
         $contact->created_by= $conJson['created_by'];
+        $contact->city= $conJson['city'];
+        $contact->state= $conJson['state'];
+        $contact->country= $conJson['country'];
+        $contact->address_type= $conJson['address_type'];
+        $contact->pincode= $conJson['pincode'];
 
         $realImage = base64_decode($conJson['image']);
         if (!empty($realImage) ){
@@ -119,6 +124,11 @@ class ContactController extends ActiveController
         $contact->learning_arcade= $conJson['learning_arcade'];
         $contact->training_pipeline= $conJson['training_pipeline'];
         $contact->leadership_edge= $conJson['leadership_edge'];
+        $contact->city= $conJson['city'];
+        $contact->state= $conJson['state'];
+        $contact->country= $conJson['country'];
+        $contact->address_type= $conJson['address_type'];
+        $contact->pincode= $conJson['pincode'];
 
         $realImage = base64_decode($conJson['image']);
 
