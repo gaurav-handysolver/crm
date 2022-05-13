@@ -9,6 +9,7 @@ use yii\base\ErrorException;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -159,6 +160,9 @@ class ContactController extends Controller
         $email = strtolower(Yii::$app->request->post('email_id'));
         $this->layout = 'businesscard';
         $model =Contact::find()->where(['code'=>$code])->one();
+        if(empty($model)) {
+            throw new HttpException(404, 'Oops! Contact does not exist anymore for the code: ' . $code);
+        }
         if(Yii::$app->request->isPost){
             if (strcasecmp($model->email,$email) == 0) {
                 return $this->redirect(['update-contact','code'=>$code,'email'=>$email]);
