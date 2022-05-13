@@ -26,8 +26,8 @@ use yii\helpers\Url;
                                 'pluginOptions' => [
                                     'overwriteInitial'=>true,
                                     'initialPreviewAsData'=>true,
-                                    'initialPreviewDownloadUrl'=>$model->imageUrl,
-                                    'initialPreview'=>$model->imageUrl,
+                                    'initialPreviewDownloadUrl'=>$model->imageUrl . '?nocache=' . time(),
+                                    'initialPreview'=>$model->imageUrl . '?nocache=' . time(),
                                     'showCaption' => false ,
                                     'deleteUrl'=>(Url::to('image-delete?code='.$model->code)),
                                     'browseIcon' => '<i class="fas fa-camera"></i>',

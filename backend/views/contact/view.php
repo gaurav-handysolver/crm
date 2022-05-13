@@ -34,7 +34,7 @@ $this->title = $model->firstname." ".$model->lastname;
                     [
                         'attribute' => 'imageUrl',
                         'label' => 'Image',
-                        'value' => $model->imageUrl,
+                        'value' => $model->imageUrl . '?nocache=' . time(),
                         'format' => ['image',['width'=>'100','height'=>'100']],
                     ],
 //                    'id',

@@ -42,8 +42,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'attribute' => 'imageUrl',
                         'label' => 'Image',
-                        'value' => 'imageUrl',
-                        'format' => ['image',['width'=>'50','height'=>'50']],
+                        'value' => function($model){
+                            if(isset($model->imageUrl)){
+                                return "<img src='" . $model->imageUrl . "?nocache=" . time() . "' style='width:50px;height:50px;'></img>";
+                            }
+                        },
+                        'format' => 'raw'
                     ],
                     'firstname',
                     'lastname',
