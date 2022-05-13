@@ -9,6 +9,7 @@ use yii\base\ErrorException;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -159,6 +160,9 @@ class ContactController extends Controller
         $email = strtolower(Yii::$app->request->post('email_id'));
         $this->layout = 'businesscard';
         $model =Contact::find()->where(['code'=>$code])->one();
+        if(empty($model)) {
+            throw new HttpException(404, 'Oops! Contact does not exist anymore for the code: ' . $code);
+        }
         if(Yii::$app->request->isPost){
             if (strcasecmp($model->email,$email) == 0) {
                 return $this->redirect(['update-contact','code'=>$code,'email'=>$email]);
@@ -189,10 +193,35 @@ class ContactController extends Controller
                     $suffix = '';
                     // add personal data
                     $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+
+                    /*$vcard->addAddress(
+                        "Jeroen Desloovere",
+                        "(extended info, again)",
+                        "25th Some Address",
+                        "Townsville",
+                        "Area 51",
+                        "045784",
+                        "Europe (is a country, right?)",
+                        'WORK;PERSONAL'
+                    );*/
+
+                    $vcard->addAddress(
+                        "",
+                        "",
+                        $model->address ? $model->address: "",
+                        $model->city ? $model->city: "",
+                        $model->state ? $model->state: "",
+                        $model->pincode ? $model->pincode: "",
+                        $model->country ? $model->country: "",
+                        $model->address_type ? $model->address_type: ""
+                    );
+
                     if (!empty($model['imageUrl'])) {
                         $vcard->addPhoto($model['imageUrl'], true);
                     } else {
-                        $vcard->addPhoto('https://handysolver.myhandydash.com/backend/web/images/male.svg', true);
+//                        $profileImage = Url::to('backend/web/img/icon-male.svg', true);
+                        $profileImage = "https://handysolver.myhandydash.com/backend/web/images/male.svg";
+                        $vcard->addPhoto($profileImage, true);
                     }
                     $vcard->addCompany($model['company']);
                     $vcard->addEmail($model['email']);
@@ -204,7 +233,7 @@ class ContactController extends Controller
 //                return $this->render('contact_url',['model' => $model,]);
                     return $this->refresh(); // <---- key point is here (prevent form data from resending on refresh)
                 } else {
-                    Yii::$app->session->setFlash('error', "Please enter a valid Code. ");
+                    Yii::$app->session->setFlash('error', "Please enter a valid code");
                     return $this->render('contact_url');
                 }
             }
