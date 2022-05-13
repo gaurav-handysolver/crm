@@ -118,12 +118,24 @@ class Contact extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        $vcard = new VCard( );
+        $vcard = new VCard();
         $firstname = $this->firstname;
         $lastname = $this->lastname;
         $additional = '';
         $prefix = '';
         $suffix = '';
+
+        $vcard->addAddress(
+            '',
+            '',
+            $this->address ?? '',
+            $this->city ?? '',
+            $this->state ?? '',
+            $this->pincode ?? '',
+            $this->country ?? '',
+            $this->address_type ?? ''
+        );
+
 
         // add personal data
         $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
