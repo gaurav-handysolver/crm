@@ -193,10 +193,35 @@ class ContactController extends Controller
                     $suffix = '';
                     // add personal data
                     $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+
+                    /*$vcard->addAddress(
+                        "Jeroen Desloovere",
+                        "(extended info, again)",
+                        "25th Some Address",
+                        "Townsville",
+                        "Area 51",
+                        "045784",
+                        "Europe (is a country, right?)",
+                        'WORK;PERSONAL'
+                    );*/
+
+                    $vcard->addAddress(
+                        "",
+                        "",
+                        $model->address ? $model->address: "",
+                        $model->city ? $model->city: "",
+                        $model->state ? $model->state: "",
+                        $model->pincode ? $model->pincode: "",
+                        $model->country ? $model->country: "",
+                        $model->address_type ? $model->address_type: ""
+                    );
+
                     if (!empty($model['imageUrl'])) {
                         $vcard->addPhoto($model['imageUrl'], true);
                     } else {
-                        $vcard->addPhoto('https://handysolver.myhandydash.com/backend/web/images/male.svg', true);
+//                        $profileImage = Url::to('backend/web/img/icon-male.svg', true);
+                        $profileImage = "https://handysolver.myhandydash.com/backend/web/images/male.svg";
+                        $vcard->addPhoto($profileImage, true);
                     }
                     $vcard->addCompany($model['company']);
                     $vcard->addEmail($model['email']);
