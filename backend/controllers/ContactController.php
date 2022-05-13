@@ -204,7 +204,7 @@ class ContactController extends Controller
 //                return $this->render('contact_url',['model' => $model,]);
                     return $this->refresh(); // <---- key point is here (prevent form data from resending on refresh)
                 } else {
-                    Yii::$app->session->setFlash('error', "Please enter a valid Code. ");
+                    Yii::$app->session->setFlash('error', "Please enter a valid code");
                     return $this->render('contact_url');
                 }
             }
