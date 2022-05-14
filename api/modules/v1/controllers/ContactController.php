@@ -288,7 +288,9 @@ class ContactController extends ActiveController
 
         $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
 
-        return $response;
+//        return $response;
+
+        return $contact;
     }
     
     function actionOnehashUpdate($model, $image, $file_url)
