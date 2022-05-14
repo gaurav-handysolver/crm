@@ -57,6 +57,12 @@ class ContactController extends ActiveController
             $contact->imageUrl .= '?nocache=' . time();
         }
 
+        if(empty($contact->address_type))
+            $contact->address_type = 'Personal';
+
+        if(empty($contact->country))
+            $contact->country = 'United States';
+
         return $contact;
     }
 
@@ -102,6 +108,7 @@ class ContactController extends ActiveController
         $contact->address_type= $conJson['address_type'] ?? '';
         $contact->pincode= $conJson['pincode'] ?? '';
         $contact->lead_id= $conJson['lead_id'] ?? '';
+        $contact->created_by= $conJson['created_by'] ?? '';
 
         if(isset($conJson['image'])){
             $realImage = base64_decode($conJson['image']);
@@ -169,7 +176,6 @@ class ContactController extends ActiveController
         $contact->country= $conJson['country'] ?? '';
         $contact->address_type= $conJson['address_type'] ?? '';
         $contact->pincode= $conJson['pincode'] ?? '';
-        $contact->lead_id= $conJson['lead_id'] ?? '';
 
         if(isset($conJson['image'])){
             $realImage = base64_decode($conJson['image']);
@@ -191,7 +197,74 @@ class ContactController extends ActiveController
         if (!$contact->save()){
             return $contact->getErrors();
         }
+        
+        // call onhash api
+        $response = $this->actionOnehashUpdate($contact);
+//        return $contact;
+        return $response;
+    }
+    
+    function actionOnehashUpdate($model)
+    {
+        // $leadId = 'CRM-LEAD-2022-00078'
+        // $authToken = 'token 2afc7871897ea0f:70a48aafae0007f'
+        $authToken = 'token '.$model->createdBy->onehash_token;
 
-        return $contact;
+        $curl = curl_init();
+        $dataArray = array(
+            "first_name"=> $model->firstname,
+            "last_name"=> $model->lastname,
+            "lead_name"=> $model->firstname." ".$model->lastname,
+            "company_name"=> $model->company,
+            "source"=> "NFC Dot App",
+            "email_id"=> $model->email,
+            "poll_guru"=> $model->pollguru,
+            "buzz"=> $model->buzz,
+            "learning_arcade"=> $model->learning_arcade,
+            "training_pipeline"=> $model->training_pipeline,
+            "leadership_edge"=> $model->leadership_edge,
+            "notes"=> $model->notes,
+            "address_title"=> $model->firstname." ".$model->address_type." address",
+            "address_type"=> $model->address_type,
+            "address_line1"=> $model->address,
+            "city"=> $model->city,
+            "state"=> $model->state,
+            "country"=> $model->country,
+            "pincode"=> $model->pincode,
+            "phone"=> $model->mobile_number,
+            "mobile_no"=> $model->mobile_number,
+            "website"=> $model->website
+        );
+        $data = json_encode($dataArray);
+        
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://one.lookingforwardconsulting.com/api/resource/Lead/".$model->lead_id,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "PUT",
+        CURLOPT_POSTFIELDS => $data,
+        CURLOPT_HTTPHEADER => array(
+            "authorization: ${authToken}",
+            "cache-control: no-cache",
+            "content-type: application/json",
+        ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            Yii:error("Contact update oneHash API curl error #:" . $err);
+            return [
+                'error' => "Contact update oneHash API curl error"
+            ];
+        } else {
+            return json_decode($response);
+        }
     }
 }
