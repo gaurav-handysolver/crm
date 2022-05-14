@@ -193,5 +193,6 @@ class ContactController extends ActiveController
         }
 
         return $contact;
+
     }
 }

@@ -148,7 +148,7 @@ class Contact extends \yii\db\ActiveRecord
         $vcard->addRole('');
         $vcard->addEmail($this->email);
         $vcard->addPhoneNumber($this->mobile_number, 'PREF;WORK');
-        $vcard->addAddress($this->address);
+//        $vcard->addAddress($this->address);
         $vcard->addURL($this->website);
         $vcard->setFilename($this->code,true);
         $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
