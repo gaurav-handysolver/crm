@@ -125,7 +125,89 @@ class ContactController extends ActiveController
             return $contact->getErrors();
         }
 
+        $leadId = $this->actionOnehashCreate($contact);
+
+        // add lead id to db returned from onehash 
+
+        $contact->lead_id = $leadId;
+        if (!$contact->save(true, ['lead_id'])){
+            return $contact->getErrors();
+        }
+
+        // add image in onehash
+        $file_url='';
+        if(!empty($conJson['image'])){
+            $file_url = $this->actionOnehashImageUpdate($contact, $conJson['image']);
+        }
+
+        $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
+
         return $contact;
+    }
+
+    function actionOnehashCreate($model)
+    {
+        // $leadId = 'CRM-LEAD-2022-00078'
+//        $authToken = 'token 2afc7871897ea0f:70a48aafae0007f';
+         $authToken = 'token '.$model->createdBy->onehash_token;
+
+        $curl = curl_init();
+        $dataArray = array(
+             "first_name"=> $model->firstname,
+             "last_name"=> $model->lastname,
+             "lead_name"=> $model->firstname." ".$model->lastname,
+             "company_name"=> $model->company,
+             "source"=> "NFC Dot App",
+             "email_id"=> $model->email,
+             "poll_guru"=> $model->pollguru,
+             "buzz"=> $model->buzz,
+             "learning_arcade"=> $model->learning_arcade,
+             "training_pipeline"=> $model->training_pipeline,
+             "leadership_edge"=> $model->leadership_edge,
+             "notes"=> $model->notes,
+             "address_title"=> $model->firstname." ".$model->address_type." address",
+             "address_type"=> $model->address_type,
+             "address_line1"=> empty($model->address) ? 'NA' : $model->address,
+             "city"=> empty($model->city) ? 'NA' : $model->city,
+             "state"=> empty($model->state) ? 'NA' : $model->state,
+             "country"=> $model->country,
+             "pincode"=> empty($model->pincode) ? 'NA' : $model->pincode,
+             "phone"=> $model->mobile_number,
+             "mobile_no"=> $model->mobile_number,
+             "website"=> $model->website,
+        );
+
+        $data = json_encode($dataArray);
+        
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://one.lookingforwardconsulting.com/api/resource/Lead",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => $data,
+        CURLOPT_HTTPHEADER => array(
+            "authorization: ${authToken}",
+            "cache-control: no-cache",
+            "content-type: application/json",
+        ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            Yii:error("Contact create oneHash API curl error #:" . $err);
+            return [
+                'error' => "Contact create oneHash API curl error"
+            ];
+        } else {
+            return json_decode($response)->data->name;
+        }
     }
 
     protected function findModel($id)
@@ -199,12 +281,17 @@ class ContactController extends ActiveController
         }
         
         // call onhash api
-        $response = $this->actionOnehashUpdate($contact);
-//        return $contact;
+        $file_url='';
+        if(!empty($conJson['image'])){
+            $file_url = $this->actionOnehashImageUpdate($contact, $conJson['image']);
+        }
+
+        $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
+
         return $response;
     }
     
-    function actionOnehashUpdate($model)
+    function actionOnehashUpdate($model, $image, $file_url)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
         // $authToken = 'token 2afc7871897ea0f:70a48aafae0007f'
@@ -233,8 +320,13 @@ class ContactController extends ActiveController
             "pincode"=> $model->pincode,
             "phone"=> $model->mobile_number,
             "mobile_no"=> $model->mobile_number,
-            "website"=> $model->website
+            "website"=> $model->website,
         );
+
+        if(!empty($image)){
+            $dataArray['image'] = $file_url;
+        }
+
         $data = json_encode($dataArray);
         
         curl_setopt_array($curl, array(
@@ -265,6 +357,53 @@ class ContactController extends ActiveController
             ];
         } else {
             return json_decode($response);
+        }
+    }
+
+    function actionOnehashImageUpdate($model, $image)
+    {
+        // $leadId = 'CRM-LEAD-2022-00078'
+//         $authToken = 'token 2afc7871897ea0f:70a48aafae0007f';
+        $authToken = 'token '.$model->createdBy->onehash_token;
+
+        $curl = curl_init();
+        $dataArray = array(
+            "docname"=> $model->lead_id,
+            "filename"=> $model->firstname . "_" . $model->lead_id . ".png",
+            "filedata"=> $image,
+            "from_form"=> "1",
+            "docfield"=> "image"
+        );
+        $data = json_encode($dataArray);
+        
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://one.lookingforwardconsulting.com/api/method/uploadfile",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "PUT",
+        CURLOPT_POSTFIELDS => $data,
+        CURLOPT_HTTPHEADER => array(
+            "authorization: ${authToken}",
+            "cache-control: no-cache",
+            "content-type: application/json",
+        ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            Yii:error("Contact image update oneHash API curl error #:" . $err);
+            return [
+                'error' => "Contact image update oneHash API curl error"
+            ];
+        } else {
+            return json_decode($response)->message->file_url;
         }
     }
 }
