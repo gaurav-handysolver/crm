@@ -408,4 +408,55 @@ class ContactController extends ActiveController
             return json_decode($response)->message->file_url;
         }
     }
+
+    function actionOnehashAddressUpdate($model, $image, $file_url)
+    {
+        $authToken = 'token '.$model->createdBy->onehash_token;
+        $curl = curl_init();
+        $dataArray = array(
+//            "address_title"=> $model->firstname." ".$model->address_type." address",
+            "address_type"=> $model->address_type,
+            "address_line1"=> $model->address,
+            "city"=> $model->city,
+            "state"=> $model->state,
+            "country"=> $model->country,
+            "pincode"=> $model->pincode,
+        );
+
+        if(!empty($image)){
+            $dataArray['image'] = $file_url;
+        }
+
+        $data = json_encode($dataArray);
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://one.lookingforwardconsulting.com/api/resource/Address/".$model->address_title,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "PUT",
+            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_HTTPHEADER => array(
+                "authorization: ${authToken}",
+                "cache-control: no-cache",
+                "content-type: application/json",
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            Yii:error("Contact-Address update oneHash API curl error #:" . $err);
+            return [
+                'error' => "Contact-Address update oneHash API curl error"
+            ];
+        } else {
+            return json_decode($response);
+        }
+    }
 }
