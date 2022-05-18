@@ -78,7 +78,7 @@ class ContactController extends ActiveController
         if($conJson['code'] == null){
             $contact->code= $code;
         }else{
-            $contact->code= strtolower($conJson['code']);
+            $contact->code= strtolower(trim($conJson['code']));
         }
 
         if(!isset($conJson['firstname']) || !isset($conJson['email'])){
@@ -104,8 +104,8 @@ class ContactController extends ActiveController
         $contact->leadership_edge= $conJson['leadership_edge'] ?? '';
         $contact->city= $conJson['city'] ?? '';
         $contact->state= $conJson['state'] ?? '';
-        $contact->country= $conJson['country'] ?? '';
-        $contact->address_type= $conJson['address_type'] ?? '';
+        $contact->country= $conJson['country'] ?? 'United States';
+        $contact->address_type= $conJson['address_type'] ?? 'Personal';
         $contact->pincode= $conJson['pincode'] ?? '';
         $contact->lead_id= $conJson['lead_id'] ?? '';
         $contact->created_by= $conJson['created_by'] ?? '';
@@ -237,7 +237,7 @@ class ContactController extends ActiveController
             ];
         }
 
-        $contact->code = $conJson['code'];
+        $contact->code = strtolower(trim($conJson['code']));
         $contact->firstname= $conJson['firstname'];
         $contact->email= $conJson['email'];
 
@@ -408,5 +408,4 @@ class ContactController extends ActiveController
             return json_decode($response)->message->file_url;
         }
     }
-
 }
