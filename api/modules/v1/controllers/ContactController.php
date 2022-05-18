@@ -78,7 +78,7 @@ class ContactController extends ActiveController
         if($conJson['code'] == null){
             $contact->code= $code;
         }else{
-            $contact->code= strtolower($conJson['code']);
+            $contact->code= strtolower(trim($conJson['code']));
         }
 
         if(!isset($conJson['firstname']) || !isset($conJson['email'])){
@@ -104,8 +104,8 @@ class ContactController extends ActiveController
         $contact->leadership_edge= $conJson['leadership_edge'] ?? '';
         $contact->city= $conJson['city'] ?? '';
         $contact->state= $conJson['state'] ?? '';
-        $contact->country= $conJson['country'] ?? '';
-        $contact->address_type= $conJson['address_type'] ?? '';
+        $contact->country= $conJson['country'] ?? 'United States';
+        $contact->address_type= $conJson['address_type'] ?? 'Personal';
         $contact->pincode= $conJson['pincode'] ?? '';
         $contact->lead_id= $conJson['lead_id'] ?? '';
         $contact->created_by= $conJson['created_by'] ?? '';
@@ -237,7 +237,7 @@ class ContactController extends ActiveController
             ];
         }
 
-        $contact->code = $conJson['code'];
+        $contact->code = strtolower(trim($conJson['code']));
         $contact->firstname= $conJson['firstname'];
         $contact->email= $conJson['email'];
 
@@ -406,57 +406,6 @@ class ContactController extends ActiveController
             ];
         } else {
             return json_decode($response)->message->file_url;
-        }
-    }
-
-    function actionOnehashAddressUpdate($model, $image, $file_url)
-    {
-        $authToken = 'token '.$model->createdBy->onehash_token;
-        $curl = curl_init();
-        $dataArray = array(
-//            "address_title"=> $model->firstname." ".$model->address_type." address",
-            "address_type"=> $model->address_type,
-            "address_line1"=> $model->address,
-            "city"=> $model->city,
-            "state"=> $model->state,
-            "country"=> $model->country,
-            "pincode"=> $model->pincode,
-        );
-
-        if(!empty($image)){
-            $dataArray['image'] = $file_url;
-        }
-
-        $data = json_encode($dataArray);
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://one.lookingforwardconsulting.com/api/resource/Address/".$model->address_title,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => $data,
-            CURLOPT_HTTPHEADER => array(
-                "authorization: ${authToken}",
-                "cache-control: no-cache",
-                "content-type: application/json",
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            Yii:error("Contact-Address update oneHash API curl error #:" . $err);
-            return [
-                'error' => "Contact-Address update oneHash API curl error"
-            ];
-        } else {
-            return json_decode($response);
         }
     }
 }
