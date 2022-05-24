@@ -142,6 +142,11 @@ class ContactController extends ActiveController
 
         $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
 
+        //  for Contact Update  start
+        $contact_title = $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
+        $response = $this->actionOnehashContactUpdate($contact,$contact_title,$file_url);
+        //  for Contact Update  end
+
         return $contact;
     }
 
