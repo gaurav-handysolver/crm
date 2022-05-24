@@ -295,7 +295,7 @@ class ContactController extends ActiveController
 
         //  for Contact Update  start
         $contact_title = $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
-        $response = $this->actionOnehashContactUpdate($contact,$contact_title);
+        $response = $this->actionOnehashContactUpdate($contact,$contact_title,$file_url);
         //  for Contact Update  end
 
         return $contact;
@@ -532,14 +532,15 @@ class ContactController extends ActiveController
     }
 
     //  update onehash Contact by contact title
-    function actionOnehashContactUpdate($model,$contact_title)
+    function actionOnehashContactUpdate($model,$contact_title,$file_url)
     {
         $authToken = 'token '.$model->createdBy->onehash_token;
         $curl = curl_init();
         $dataArray = array(
             "first_name"=> $model->firstname,
             "last_name"=> $model->lastname,
-            "company_name"=> $model->company
+            "company_name"=> $model->company,
+            "image"=>$file_url
         );
 
         $data = json_encode($dataArray);
