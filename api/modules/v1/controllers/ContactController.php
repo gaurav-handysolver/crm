@@ -279,8 +279,6 @@ class ContactController extends ActiveController
         if (!$contact->save()){
             return $contact->getErrors();
         }
-
-//        $contact->save();
         
         // call onhash api
         $file_url='';
@@ -290,9 +288,15 @@ class ContactController extends ActiveController
 
         $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
 
+        //  for Address Update  start
         $address_title = $this->actionFindOnehashAddress($contact->email,$contact->createdBy->onehash_token);
-
         $response = $this->actionOnehashAddressUpdate($contact,$address_title);
+        //  for Address Update  end
+
+        //  for Contact Update  start
+        $contact_title = $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
+        $response = $this->actionOnehashContactUpdate($contact,$contact_title);
+        //  for Contact Update  end
 
         return $contact;
     }
@@ -319,11 +323,11 @@ class ContactController extends ActiveController
             "notes"=> $model->notes,
             "address_title"=> $model->firstname." ".$model->address_type." address",
             "address_type"=> $model->address_type,
-            "address_line1"=> $model->address,
-            "city"=> $model->city,
-            "state"=> $model->state,
+            "address_line1"=> $model->address ?: "NA",
+            "city"=> $model->city ?: "NA",
+            "state"=> $model->state ?: "NA",
             "country"=> $model->country,
-            "pincode"=> $model->pincode,
+            "pincode"=> $model->pincode ?: "NA",
             "phone"=> $model->mobile_number,
             "mobile_no"=> $model->mobile_number,
             "website"=> $model->website,
@@ -459,7 +463,7 @@ class ContactController extends ActiveController
             "city"=> $model->city ?: "NA",
             "state"=> $model->state ?: "NA",
             "country"=> $model->country ?: "United States",
-            "pincode"=> $model->pincode,
+            "pincode"=> $model->pincode ?: "NA",
         );
         $data = json_encode($dataArray);
         curl_setopt_array($curl, array(
@@ -487,6 +491,83 @@ class ContactController extends ActiveController
             Yii:error("Contact-Address update oneHash API curl error #:" . $err);
             return [
                 'error' => "Contact-Address update oneHash API curl error"
+            ];
+        } else {
+            return json_decode($response);
+        }
+    }
+
+    //  find onehash Contact by email_id
+    function actionFindOnehashContact($emailId,$authToken)
+    {
+        $authToken1 = 'token '.$authToken;
+        $url = 'https://one.lookingforwardconsulting.com/api/resource/Contact?filters=[["email_id","=",'.'"'.$emailId.'"'.']]';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL =>$url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: ${authToken1}",
+                "cache-control: no-cache",
+                "content-type: application/json",
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+        if ($err) {
+            Yii:error("Lead-Address Getting oneHash API curl error #:" . $err);
+            return [
+                'error' => "Lead-Address Getting oneHash API curl error"
+            ];
+        } else {
+            return json_decode($response)->data[0]->name;
+        }
+    }
+
+    //  update onehash Contact by contact title
+    function actionOnehashContactUpdate($model,$contact_title)
+    {
+        $authToken = 'token '.$model->createdBy->onehash_token;
+        $curl = curl_init();
+        $dataArray = array(
+            "first_name"=> $model->firstname,
+            "last_name"=> $model->lastname,
+            "company_name"=> $model->company
+        );
+
+        $data = json_encode($dataArray);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://one.lookingforwardconsulting.com/api/resource/Contact/".$contact_title,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "PUT",
+            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_HTTPHEADER => array(
+                "authorization: ${authToken}",
+                "cache-control: no-cache",
+                "content-type: application/json",
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            Yii:error("Contact update oneHash API curl error #:" . $err);
+            return [
+                'error' => "Contact update oneHash API curl error"
             ];
         } else {
             return json_decode($response);
