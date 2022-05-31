@@ -469,6 +469,7 @@ class ContactController extends ActiveController
             "state"=> $model->state ?: "NA",
             "country"=> $model->country ?: "United States",
             "pincode"=> $model->pincode ?: "NA",
+            "phone"=> $model->mobile_number,
         );
         $data = json_encode($dataArray);
         curl_setopt_array($curl, array(
@@ -545,7 +546,19 @@ class ContactController extends ActiveController
             "first_name"=> $model->firstname,
             "last_name"=> $model->lastname,
             "company_name"=> $model->company,
-            "image"=>$file_url
+            "image"=>$file_url,
+            "phone_nos" => [
+                [
+                    "phone" => $model->mobile_number,
+                    "is_primary_phone" => 1,
+                    "is_primary_mobile_no"=> 0
+                ],
+                [
+                    "phone" => $model->mobile_number,
+                    "is_primary_phone" => 0,
+                    "is_primary_mobile_no" => 1
+                ]
+            ]
         );
 
         $data = json_encode($dataArray);
