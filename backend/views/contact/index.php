@@ -45,6 +45,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => function($model){
                             if(isset($model->imageUrl)){
                                 return "<img src='" . $model->imageUrl . "?nocache=" . time() . "' style='width:50px;height:50px;'></img>";
+                            }else{
+                                return "<img src='https://crm.lookingforwardconsulting.com/backend/web/img/anonymous.png' style='width:50px;height:50px;'></img>";
                             }
                         },
                         'format' => 'raw'
