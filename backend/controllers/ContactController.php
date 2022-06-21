@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\components\onehas\OneHasService;
 use Yii;
 use common\models\Contact;
 use backend\models\search\ContactSearch;
@@ -122,7 +123,10 @@ class ContactController extends Controller
 //        for Input Validation : End
         if(!empty($model)){
             if ($model->load(Yii::$app->request->post())) {
+
                 $logoFile = UploadedFile::getInstance($model, 'imageUrl');
+                $imagePreviousValue = $model->getOldAttribute('imageUrl');
+
                 if (!empty($logoFile)) {
                     $uploadPath = Yii::getAlias('@storage') . '/web/source' . '/' . $model->code . '.jpeg';
                     $upload = $logoFile->saveAs($uploadPath);
@@ -134,10 +138,34 @@ class ContactController extends Controller
                         $model->imageUrl = $url;
                         $model->save();
                     }
-                } else {
-                    $model->imageUrl = $model->getOldAttribute('imageUrl');
+                } elseif ($imagePreviousValue!=NULL) {
+                    $model->imageUrl = $imagePreviousValue;
+                    $model->save();
+                }else{
+                    $model->imageUrl = NULL;
                     $model->save();
                 }
+
+                //Update the contact details on OneHas as well
+                $contact = new OneHasService();
+                $file_url='';
+                if($model->imageUrl!=''){
+                    $file_url = $contact->actionOnehashImageUpdate($model);
+                }
+                $updateLeadData = $contact->actionOnehashUpdate($model,$logoFile,$file_url);
+
+                //  for Address Update  start
+                $address_title = $contact->actionFindOnehashAddress($model->email,$model->createdBy->onehash_token);
+                if($address_title['status']){
+                    $response = $contact->actionOnehashAddressUpdate($model,$address_title['data']);
+                }
+                //  for Address Update  end
+
+                $contact_title = $contact->actionFindOnehashContact($model->email,$model->createdBy->onehash_token);
+                if($contact_title['status']){
+                    $updateOneHasData = $contact->actionOnehashContactUpdate($model,$contact_title['data'],$file_url);
+                }
+
 
         if (Yii::$app->user->isGuest){
             return $this->redirect(['view-contact','code'=>$code]);
