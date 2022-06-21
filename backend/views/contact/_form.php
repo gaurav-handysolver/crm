@@ -111,7 +111,8 @@ use yii\helpers\Url;
 
                     <div class="col-md-12">
                         <div class="form-group">
-                            <?php echo Yii::$app->user->isGuest == false ? $form->field($model, 'code')->textInput(['maxlength' => true]) : '' ?>
+                            <?php echo Yii::$app->user->isGuest == false ? $form->field($model, 'code')->textInput(['maxlength' => true]) .
+                                '<p style="font-size: 13px;margin-top: -16px;"><span class="text-danger">Warning!</span> If code is changed then Dot has to be rewritten.</p>' : '' ?>
                         </div>
                     </div>
                 </div>
