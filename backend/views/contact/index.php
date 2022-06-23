@@ -170,11 +170,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
     document.querySelectorAll(".copy-to-clipboard").forEach(button => {
         button.addEventListener('click', (event) => {
-        console.log(event.target.dataset.url);
     var link = event.target.dataset.url;
-    navigator.clipboard.writeText(link);
-    alert("Link Copied");
+    copyText(link);
+    // navigator.clipboard.writeText(link);
+    // alert("");
     })
     })
+
+    async function copyText(link){
+        await navigator.clipboard.writeText(link).then(()=>{
+         alert("Link Copied");
+        }).catch(()=>{
+            alert("Link not copied");
+        })
+    }
 
 </script>
