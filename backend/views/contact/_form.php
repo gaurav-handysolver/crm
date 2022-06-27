@@ -57,7 +57,7 @@ use yii\helpers\Url;
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <?php echo strtolower($form->field($model, 'email')->textInput(['maxlength' => true])) ?>
+                            <?php echo strtolower($form->field($model, 'email')->textInput(['disabled' => true])) ?>
                         </div>
                     </div>
 
