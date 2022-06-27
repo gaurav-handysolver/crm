@@ -94,6 +94,8 @@ class ContactController extends ActiveController
         $contact->company= $conJson['company'] ?? '';
 
         $contact->mobile_number= $conJson['mobile_number'] ?? '';
+        $contact->phone_number= $conJson['phone_number'] ?? '';
+        $contact->job_title= $conJson['job_title'] ?? '';
         $contact->website= $conJson['website'] ?? '';
         $contact->notes= $conJson['notes'] ?? '';
         $contact->address= $conJson['address'] ?? '';
@@ -177,7 +179,8 @@ class ContactController extends ActiveController
              "state"=> empty($model->state) ? 'NA' : $model->state,
              "country"=> $model->country,
              "pincode"=> empty($model->pincode) ? 'NA' : $model->pincode,
-             "phone"=> $model->mobile_number,
+             "phone"=> $model->phone_number,
+             "job_title"=> $model->job_title,
              "mobile_no"=> $model->mobile_number,
              "website"=> $model->website,
         );
@@ -250,6 +253,8 @@ class ContactController extends ActiveController
         $contact->company= $conJson['company'] ?? '';
 
         $contact->mobile_number= $conJson['mobile_number'] ?? '';
+        $contact->phone_number= $conJson['phone_number'] ?? '';
+        $contact->job_title= $conJson['job_title'] ?? '';
         $contact->website= $conJson['website'] ?? '';
         $contact->notes= $conJson['notes'] ?? '';
         $contact->address= $conJson['address'] ?? '';
@@ -333,7 +338,8 @@ class ContactController extends ActiveController
             "state"=> $model->state ?: "NA",
             "country"=> $model->country,
             "pincode"=> $model->pincode ?: "NA",
-            "phone"=> $model->mobile_number,
+            "phone"=> $model->phone_number,
+            "job_title"=> $model->job_title,
             "mobile_no"=> $model->mobile_number,
             "website"=> $model->website,
         );
@@ -469,7 +475,7 @@ class ContactController extends ActiveController
             "state"=> $model->state ?: "NA",
             "country"=> $model->country ?: "United States",
             "pincode"=> $model->pincode ?: "NA",
-            "phone"=> $model->mobile_number,
+            "phone"=> $model->phone_number,
         );
         $data = json_encode($dataArray);
         curl_setopt_array($curl, array(
@@ -549,7 +555,7 @@ class ContactController extends ActiveController
             "image"=>$file_url,
             "phone_nos" => [
                 [
-                    "phone" => $model->mobile_number,
+                    "phone" => $model->phone_number,
                     "is_primary_phone" => 1,
                     "is_primary_mobile_no"=> 0
                 ],

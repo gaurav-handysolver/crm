@@ -69,6 +69,18 @@ use yii\helpers\Url;
 
                     <div class="col-md-6">
                         <div class="form-group">
+                            <?php echo $form->field($model,'job_title')->textInput(['maxlength'=>true]) ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <?php echo $form->field($model,'phone_number')->textInput(['maxlength'=>true]) ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <?php echo $form->field($model, 'website')->textInput(['maxlength' => true]) ?>
                         </div>
                     </div>

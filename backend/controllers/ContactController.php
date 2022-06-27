@@ -2,7 +2,7 @@
 
 namespace backend\controllers;
 
-use common\components\onehas\OneHasService;
+use common\components\onehash\OneHashService;
 use Yii;
 use common\models\Contact;
 use backend\models\search\ContactSearch;
@@ -147,7 +147,7 @@ class ContactController extends Controller
                 }
 
                 //Update the contact details on OneHas as well
-                $contact = new OneHasService();
+                $contact = new OneHashService();
                 $file_url='';
                 if($model->imageUrl!=''){
                     $file_url = $contact->actionOnehashImageUpdate($model);

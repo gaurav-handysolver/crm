@@ -35,6 +35,9 @@ use Yii;
  * @property string $updated_at
  * @property string $created_at
  *
+ *  @property string job_title
+ *  @property string phone_number
+ *
  * @property User $createdBy
  */
 class Contact extends \yii\db\ActiveRecord
@@ -65,6 +68,8 @@ class Contact extends \yii\db\ActiveRecord
             [['mobile_number'], 'string', 'max' => 20],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['city', 'state', 'country', 'address_type', 'pincode', 'lead_id'], 'string', 'max' => 255],
+            [['job_title'],'string'],
+            [['phone_number'],'string','max'=>20]
         ];
     }
 
@@ -100,6 +105,9 @@ class Contact extends \yii\db\ActiveRecord
             'address_type' => Yii::t('common\models', 'Address Type'),
             'pincode' => Yii::t('common\models', 'Pin Code'),
             'lead_id' => Yii::t('common\models', 'Lead Id'),
+
+            'job_title' => Yii::t('common\models', 'Job Title'),
+            'phone_number' => Yii::t('common\models', 'Phone Number'),
         ];
     }
 

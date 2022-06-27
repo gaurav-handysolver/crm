@@ -1,10 +1,10 @@
 <?php
 
-namespace common\components\onehas;
+namespace common\components\onehash;
 
 use Yii;
 
-class OneHasService
+class OneHashService
 {
     function actionFindOnehashContact($emailId,$authToken)
     {
@@ -120,7 +120,7 @@ class OneHasService
             "image"=>$file_url,
             "phone_nos" => [
                 [
-                    "phone" => $model->mobile_number,
+                    "phone" => $model->phone_number,
                     "is_primary_phone" => 1,
                     "is_primary_mobile_no"=> 0
                 ],
@@ -154,6 +154,7 @@ class OneHasService
         $err = curl_error($curl);
 
         curl_close($curl);
+
 
         if ($err) {
             Yii::error("Contact update oneHash API curl error #:" . $err);
@@ -195,9 +196,10 @@ class OneHasService
             "state"=> $model->state ?: "NA",
             "country"=> $model->country,
             "pincode"=> $model->pincode ?: "NA",
-            "phone"=> $model->mobile_number,
+            "phone"=> $model->phone_number,
             "mobile_no"=> $model->mobile_number,
             "website"=> $model->website,
+            "job_title" => $model->job_title
         );
 
         if(!empty($image)){
@@ -302,7 +304,7 @@ class OneHasService
             "state"=> $model->state ?: "NA",
             "country"=> $model->country ?: "United States",
             "pincode"=> $model->pincode ?: "NA",
-            "phone"=> $model->mobile_number,
+            "phone"=> $model->phone_number,
         );
         $data = json_encode($dataArray);
         curl_setopt_array($curl, array(
