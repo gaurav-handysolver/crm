@@ -69,7 +69,7 @@ class Contact extends \yii\db\ActiveRecord
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['city', 'state', 'country', 'address_type', 'pincode', 'lead_id'], 'string', 'max' => 255],
             [['job_title'],'string'],
-            [['phone_number'],'string','max'=>20]
+            [['phone_number'],'integer']
         ];
     }
 
