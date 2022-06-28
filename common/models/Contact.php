@@ -65,7 +65,7 @@ class Contact extends \yii\db\ActiveRecord
             [['website'], 'string', 'max' => 512],
             [['notes','address'], 'string'],
             [['imageUrl'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpeg,png,jpg'],
-            [['mobile_number'], 'string', 'max' => 20],
+            [['mobile_number'], 'integer'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['city', 'state', 'country', 'address_type', 'pincode', 'lead_id'], 'string', 'max' => 255],
             [['job_title'],'string'],
@@ -152,10 +152,11 @@ class Contact extends \yii\db\ActiveRecord
         }
         // add work data
         $vcard->addCompany($this->company);
-        $vcard->addJobtitle('');
+        $vcard->addJobtitle($this->job_title);
         $vcard->addRole('');
         $vcard->addEmail($this->email);
-        $vcard->addPhoneNumber($this->mobile_number, 'PREF;WORK');
+        $vcard->addPhoneNumber($this->phone_number, 'PREF;HOME');
+        $vcard->addPhoneNumber($this->mobile_number,'PREF;CELL');
 //        $vcard->addAddress($this->address);
         $vcard->addURL($this->website);
         $vcard->setFilename($this->code,true);
