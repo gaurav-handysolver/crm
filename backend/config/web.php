@@ -88,6 +88,11 @@ $config = [
                 'allow' => true,
                 'roles' => ['manager', 'administrator'],
             ],
+            [
+                'controllers' => ['pages'],
+                'allow' => true,
+                'roles' => ['?'],
+            ],
         ],
     ],
 ];
