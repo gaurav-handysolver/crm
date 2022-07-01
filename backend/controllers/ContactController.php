@@ -219,19 +219,6 @@ class ContactController extends Controller
                     $additional = '';
                     $prefix = '';
                     $suffix = '';
-                    // add personal data
-                    $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
-
-                    /*$vcard->addAddress(
-                        "Jeroen Desloovere",
-                        "(extended info, again)",
-                        "25th Some Address",
-                        "Townsville",
-                        "Area 51",
-                        "045784",
-                        "Europe (is a country, right?)",
-                        'WORK;PERSONAL'
-                    );*/
 
                     $vcard->addAddress(
                         '',
@@ -244,15 +231,22 @@ class ContactController extends Controller
                         $model->address_type ?? ''
                     );
 
+                    // add personal data
+                    $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+
                     if (!empty($model['imageUrl'])) {
-                        $vcard->addPhoto($model['imageUrl'], true);
+                        $image = $model['imageUrl'];
+                        $vcard->addPhoto($image, true);
                     } else {
+
 //                        $profileImage = Url::to('backend/web/img/icon-male.svg', true);
                         $profileImage = "https://handysolver.myhandydash.com/backend/web/images/male.svg";
                         $vcard->addPhoto($profileImage, true);
                     }
                     $vcard->addCompany($model['company']);
                     $vcard->addEmail($model['email']);
+                    $vcard->addJobtitle($model['job_title']);
+                    $vcard->addPhoneNumber($model['phone_number'], 'PREF;HOME');
                     $vcard->addPhoneNumber($model['mobile_number'], 'PREF;WORK');
 //                $vcard->addAddress($model['address']);
                     $vcard->addURL($model['website']);
