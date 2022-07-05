@@ -2,6 +2,7 @@
 
     namespace api\modules\v1\controllers;
     use api\modules\v1\resources\Contact;
+    use backend\models\OneHash;
     use Yii;
     use yii\data\ActiveDataProvider;
     use yii\helpers\Url;
@@ -127,27 +128,38 @@ class ContactController extends ActiveController
             return $contact->getErrors();
         }
 
-        $leadId = $this->actionOnehashCreate($contact);
+        //Check the OneHash setting is one/off
+        $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
+        if($oneHashSettingStatus->is_enabled == OneHash::ONE_HASH_SETTING_OFF) {
+            $leadId = $this->actionOnehashCreate($contact);
 
-        // add lead id to db returned from onehash 
+            // add lead id to db returned from onehash
 
-        $contact->lead_id = $leadId;
-        if (!$contact->save(true, ['lead_id'])){
-            return $contact->getErrors();
+            $contact->lead_id = $leadId;
+            if (!$contact->save(true, ['lead_id'])) {
+                return $contact->getErrors();
+            }
+
+            // add image in onehash
+            if (isset($conJson['image']) && !empty($conJson['image'])) {
+                $myImage = $conJson['image'];
+            } else {
+                $myImage = '';
+            }
+            $file_url = '';
+            if (!empty($conJson['image'])) {
+                $file_url = $this->actionOnehashImageUpdate($contact, $myImage);
+            }
+
+            $response = $this->actionOnehashUpdate($contact, $myImage, $file_url);
+
+            //  for Contact Update  start
+            $contact_title = $this->actionFindOnehashContact($contact->email, $contact->createdBy->onehash_token);
+            if($contact_title['status']){
+                $response = $this->actionOnehashContactUpdate($contact, $contact_title['msg'], $file_url);
+            }
+            //  for Contact Update  end
         }
-
-        // add image in onehash
-        $file_url='';
-        if(!empty($conJson['image'])){
-            $file_url = $this->actionOnehashImageUpdate($contact, $conJson['image']);
-        }
-
-        $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
-
-        //  for Contact Update  start
-        $contact_title = $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
-        $response = $this->actionOnehashContactUpdate($contact,$contact_title,$file_url);
-        //  for Contact Update  end
 
         return $contact;
     }
@@ -209,7 +221,7 @@ class ContactController extends ActiveController
         curl_close($curl);
 
         if ($err) {
-            Yii:error("Contact create oneHash API curl error #:" . $err);
+            Yii::error("Contact create oneHash API curl error #:" . $err);
             return [
                 'error' => "Contact create oneHash API curl error"
             ];
@@ -228,6 +240,7 @@ class ContactController extends ActiveController
 
     public function actionUpdate($code)
     {
+
         $post = file_get_contents("php://input");
         $conJson = (array) \json_decode($post);
 
@@ -289,26 +302,40 @@ class ContactController extends ActiveController
         if (!$contact->save()){
             return $contact->getErrors();
         }
-        
-        // call onhash api
-        $file_url='';
-        if(!empty($conJson['image'])){
-            $file_url = $this->actionOnehashImageUpdate($contact, $conJson['image']);
+
+        //Check the OneHash setting is one/off
+        $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
+        if($oneHashSettingStatus->is_enabled == OneHash::ONE_HASH_SETTING_OFF) {
+
+            //Check contact present on OneHash or not
+            $contactName  =  $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
+            if($contactName['status']){
+                // call onhash api
+                if (isset($conJson['image']) && !empty($conJson['image'])) {
+                    $myImage = $conJson['image'];
+                } else {
+                    $myImage = '';
+                }
+
+                $file_url = '';
+                if (!empty($conJson['image'])) {
+                    $file_url = $this->actionOnehashImageUpdate($contact, $myImage);
+                }
+
+                $response = $this->actionOnehashUpdate($contact, $myImage, $file_url);
+
+                //  for Address Update  start
+                $address_title = $this->actionFindOnehashAddress($contact->email, $contact->createdBy->onehash_token);
+                $response = $this->actionOnehashAddressUpdate($contact, $address_title);
+                //  for Address Update  end
+
+                //  for Contact Update  start
+                $response = $this->actionOnehashContactUpdate($contact, $contactName['msg'], $file_url);
+                //  for Contact Update  end
+            }
         }
 
-        $response = $this->actionOnehashUpdate($contact, $conJson['image'], $file_url);
-
-        //  for Address Update  start
-        $address_title = $this->actionFindOnehashAddress($contact->email,$contact->createdBy->onehash_token);
-        $response = $this->actionOnehashAddressUpdate($contact,$address_title);
-        //  for Address Update  end
-
-        //  for Contact Update  start
-        $contact_title = $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
-        $response = $this->actionOnehashContactUpdate($contact,$contact_title,$file_url);
-        //  for Contact Update  end
-
-        return $contact;
+        return ['status'=>true,"data"=>$contact];
     }
     
     function actionOnehashUpdate($model, $image, $file_url)
@@ -318,6 +345,11 @@ class ContactController extends ActiveController
         $authToken = 'token '.$model->createdBy->onehash_token;
 
         $curl = curl_init();
+
+        //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
         $dataArray = array(
             "first_name"=> $model->firstname,
             "last_name"=> $model->lastname,
@@ -372,7 +404,7 @@ class ContactController extends ActiveController
         curl_close($curl);
 
         if ($err) {
-            Yii:error("Contact update oneHash API curl error #:" . $err);
+            Yii::error("Contact update oneHash API curl error #:" . $err);
             return [
                 'error' => "Contact update oneHash API curl error"
             ];
@@ -419,7 +451,7 @@ class ContactController extends ActiveController
         curl_close($curl);
 
         if ($err) {
-            Yii:error("Contact image update oneHash API curl error #:" . $err);
+            Yii::error("Contact image update oneHash API curl error #:" . $err);
             return [
                 'error' => "Contact image update oneHash API curl error"
             ];
@@ -434,6 +466,11 @@ class ContactController extends ActiveController
         $authToken1 = 'token '.$authToken;
         $url = 'https://one.lookingforwardconsulting.com/api/resource/Address?filters=[["email_id","=",'.'"'.$emailId.'"'.']]';
         $curl = curl_init();
+
+        //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
         curl_setopt_array($curl, array(
             CURLOPT_URL =>$url,
             CURLOPT_RETURNTRANSFER => true,
@@ -453,7 +490,7 @@ class ContactController extends ActiveController
 
         curl_close($curl);
         if ($err) {
-            Yii:error("Lead-Address Getting oneHash API curl error #:" . $err);
+            Yii::error("Lead-Address Getting oneHash API curl error #:" . $err);
             return [
                 'error' => "Lead-Address Getting oneHash API curl error"
             ];
@@ -467,6 +504,11 @@ class ContactController extends ActiveController
     {
         $authToken = 'token '.$model->createdBy->onehash_token;
         $curl = curl_init();
+
+        //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
         $dataArray = array(
             "address_title"=> $model->firstname." ".$model->address_type ?? "Personal" ." address",
             "address_type"=> $model->address_type ?: "Personal",
@@ -500,7 +542,7 @@ class ContactController extends ActiveController
         curl_close($curl);
 
         if ($err) {
-            Yii:error("Contact-Address update oneHash API curl error #:" . $err);
+            Yii::error("Contact-Address update oneHash API curl error #:" . $err);
             return [
                 'error' => "Contact-Address update oneHash API curl error"
             ];
@@ -515,6 +557,11 @@ class ContactController extends ActiveController
         $authToken1 = 'token '.$authToken;
         $url = 'https://one.lookingforwardconsulting.com/api/resource/Contact?filters=[["email_id","=",'.'"'.$emailId.'"'.']]';
         $curl = curl_init();
+
+        //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
         curl_setopt_array($curl, array(
             CURLOPT_URL =>$url,
             CURLOPT_RETURNTRANSFER => true,
@@ -532,14 +579,22 @@ class ContactController extends ActiveController
         $response = curl_exec($curl);
         $err = curl_error($curl);
 
+        $data = json_decode($response)->data;
+        if(isset($data) && !empty($data)){
+            $contactName = $data[0]->name;
+        }else{
+           return array('status'=>false,'msg'=>"Contact not found");
+        }
+
         curl_close($curl);
         if ($err) {
-            Yii:error("Lead-Address Getting oneHash API curl error #:" . $err);
+            Yii::error("Lead-Address Getting oneHash API curl error #:" . $err);
             return [
+                'status' => false,
                 'error' => "Lead-Address Getting oneHash API curl error"
             ];
         } else {
-            return json_decode($response)->data[0]->name;
+            return array('status'=>true,"msg"=>$contactName);
         }
     }
 
@@ -548,6 +603,11 @@ class ContactController extends ActiveController
     {
         $authToken = 'token '.$model->createdBy->onehash_token;
         $curl = curl_init();
+
+        //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
         $dataArray = array(
             "first_name"=> $model->firstname,
             "last_name"=> $model->lastname,
@@ -590,7 +650,7 @@ class ContactController extends ActiveController
         curl_close($curl);
 
         if ($err) {
-            Yii:error("Contact update oneHash API curl error #:" . $err);
+            Yii::error("Contact update oneHash API curl error #:" . $err);
             return [
                 'error' => "Contact update oneHash API curl error"
             ];

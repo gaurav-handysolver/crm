@@ -375,6 +375,12 @@ $logEntries[] = [
                             'badge' => SystemLog::find()->count(),
                             'badgeBgClass' => 'badge-danger',
                         ],
+
+                        [
+                            'label' => Yii::t('backend', 'OneHash Setting'),
+                            'url' => ['/one-hash/save-setting'],
+                            'icon' => FAS::icon('cog', ['class' => ['nav-icon']]),
+                        ],
                     ],
                 ]) ?>
             </nav>
