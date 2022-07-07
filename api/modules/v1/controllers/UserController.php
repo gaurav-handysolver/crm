@@ -4,6 +4,7 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\models\LoginForm;
 use common\models\User;
+use Firebase\JWT\JWT;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\auth\CompositeAuth;
@@ -69,13 +70,44 @@ class UserController extends Controller
     {
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post(), '') && $model->login()) {
-            return $model->getUser()->toArray(['id', 'username', 'access_token','onehash_token']);
+            $jwt = $this->generateJwtToken($model->getUser()->email);
+            $user = $model->getUser();
+            return [
+                'id'=> $user->id,
+                'username'=> $user->username,
+                'access_token'=> $user->access_token,
+                'onehash_token' => $user->onehash_token,
+                'jwt_token' => $jwt
+            ];
+//            return $model->getUser()->toArray(['id', 'username', 'access_token','onehash_token']);
         }
 
         Yii::$app->response->statusCode = 422;
         return [
             'errors' => $model->errors,
         ];
+    }
+
+    /**
+     * @param $email
+     * @return string|null
+     * Generate JWT token using user's email address
+     */
+    public function generateJwtToken($email){
+        $issueAt = time();
+
+        $data = [
+            'iat'=>$issueAt,
+            'nbf' => $issueAt,
+            'email' => $email
+        ];
+
+        $jwt = JWT::encode($data,BaseController::JWT_SECRET_KEY,'HS512');
+
+        if(isset($jwt)){
+            return $jwt;
+        }
+        return null;
     }
 
 }
