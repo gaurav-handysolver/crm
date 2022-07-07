@@ -126,9 +126,49 @@ class Contact extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+//         $vcard = new VCard();
+//         $firstname = $this->firstname;
+//         $lastname = $this->lastname;
+//         $additional = '';
+//         $prefix = '';
+//         $suffix = '';
+
+//         $vcard->addAddress(
+//             '',
+//             '',
+//             $this->address ?? '',
+//             $this->city ?? '',
+//             $this->state ?? '',
+//             $this->pincode ?? '',
+//             $this->country ?? '',
+//             $this->address_type ?? ''
+//         );
+
+
+//         // add personal data
+//         $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
+//         if (!empty($this->imageUrl)){
+//             $vcard->addPhoto($this->imageUrl,true);
+//         }
+//         // add work data
+//         $vcard->addCompany($this->company);
+//         $vcard->addJobtitle($this->job_title);
+//         $vcard->addRole('');
+//         $vcard->addEmail($this->email);
+//         $vcard->addPhoneNumber($this->phone_number, 'PREF;HOME');
+//         $vcard->addPhoneNumber($this->mobile_number,'PREF;CELL');
+// //        $vcard->addAddress($this->address);
+//         $vcard->addURL($this->website);
+//         $vcard->setFilename($this->code,true);
+//         $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
+//         return $vcard->save();
+    }
+
+    public static function writeVcard($contact){
+
         $vcard = new VCard();
-        $firstname = $this->firstname;
-        $lastname = $this->lastname;
+        $firstname = $contact->firstname;
+        $lastname = $contact->lastname;
         $additional = '';
         $prefix = '';
         $suffix = '';
@@ -136,30 +176,29 @@ class Contact extends \yii\db\ActiveRecord
         $vcard->addAddress(
             '',
             '',
-            $this->address ?? '',
-            $this->city ?? '',
-            $this->state ?? '',
-            $this->pincode ?? '',
-            $this->country ?? '',
-            $this->address_type ?? ''
+            $contact->address ?? '',
+            $contact->city ?? '',
+            $contact->state ?? '',
+            $contact->pincode ?? '',
+            $contact->country ?? '',
+            $contact->address_type ?? ''
         );
 
 
         // add personal data
         $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
-        if (!empty($this->imageUrl)){
-            $vcard->addPhoto($this->imageUrl,true);
+        if (!empty($contact->imageUrl)){
+            $vcard->addPhoto($contact->imageUrl,true);
         }
         // add work data
-        $vcard->addCompany($this->company);
-        $vcard->addJobtitle($this->job_title);
+        $vcard->addCompany($contact->company);
+        $vcard->addJobtitle($contact->job_title);
         $vcard->addRole('');
-        $vcard->addEmail($this->email);
-        $vcard->addPhoneNumber($this->phone_number, 'PREF;HOME');
-        $vcard->addPhoneNumber($this->mobile_number,'PREF;CELL');
-//        $vcard->addAddress($this->address);
-        $vcard->addURL($this->website);
-        $vcard->setFilename($this->code,true);
+        $vcard->addEmail($contact->email);
+        $vcard->addPhoneNumber($contact->phone_number, 'PREF;HOME');
+        $vcard->addPhoneNumber($contact->mobile_number,'PREF;CELL');
+        $vcard->addURL($contact->website);
+        $vcard->setFilename($contact->code,true);
         $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
         return $vcard->save();
     }

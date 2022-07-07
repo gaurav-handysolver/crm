@@ -59,7 +59,8 @@
     "rmrevin/yii2-fontawesome": "^3.4",
     "kartik-v/yii2-widgets": "^3.4",
     "jeroendesloovere/vcard": "^1.7",
-    "aws/aws-sdk-php": "^3.222"
+    "aws/aws-sdk-php": "^3.222",
+    "firebase/php-jwt": "^6.2"
   },
   "require-dev": {
     "yiisoft/yii2-gii": "^2.0.0",
@@ -77,7 +78,10 @@
   },
   "config": {
     "process-timeout": 1800,
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
+    }
   },
   "repositories": [
     {
