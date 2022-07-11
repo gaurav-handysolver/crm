@@ -3,6 +3,7 @@
     namespace api\modules\v1\controllers;
     use api\modules\v1\resources\Contact;
     use backend\models\OneHash;
+    use common\components\awsParameterStore\AwsParameterStore;
     use Yii;
     use yii\data\ActiveDataProvider;
     use yii\helpers\Url;
@@ -131,7 +132,18 @@ class ContactController extends ActiveController
         //Check the OneHash setting is one/off
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
         if($oneHashSettingStatus->is_enabled == OneHash::ONE_HASH_SETTING_OFF) {
-            $leadId = $this->actionOnehashCreate($contact);
+
+            //Get the OneHashToken from AWS Parameter Store
+            $aws = new AwsParameterStore();
+            $result = $aws->actionGetParameter($contact->created_by);
+
+            if($result['status']){
+               $oneHashToken = $result['oneHashTokenValue'];
+            }else{
+                return array("Error"=> $result['msg']);
+            }
+
+            $leadId = $this->oneHashCreate($contact,$oneHashToken);
 
             // add lead id to db returned from onehash
 
@@ -148,15 +160,15 @@ class ContactController extends ActiveController
             }
             $file_url = '';
             if (!empty($conJson['image'])) {
-                $file_url = $this->actionOnehashImageUpdate($contact, $myImage);
+                $file_url = $this->oneHashImageUpdate($contact, $myImage,$oneHashToken);
             }
 
-            $response = $this->actionOnehashUpdate($contact, $myImage, $file_url);
+            $response = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
 
             //  for Contact Update  start
-            $contact_title = $this->actionFindOnehashContact($contact->email, $contact->createdBy->onehash_token);
+            $contact_title = $this->findOneHashContact($contact->email, $oneHashToken);
             if($contact_title['status']){
-                $response = $this->actionOnehashContactUpdate($contact, $contact_title['msg'], $file_url);
+                $response = $this->oneHashContactUpdate($contact, $contact_title['msg'], $file_url,$oneHashToken);
             }
             //  for Contact Update  end
         }
@@ -164,11 +176,11 @@ class ContactController extends ActiveController
         return $contact;
     }
 
-    function actionOnehashCreate($model)
+    function oneHashCreate($model,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
 //        $authToken = 'token 2afc7871897ea0f:70a48aafae0007f';
-         $authToken = 'token '.$model->createdBy->onehash_token;
+         $authToken = 'token '.$oneHashToken;
 
         $curl = curl_init();
         $dataArray = array(
@@ -307,8 +319,18 @@ class ContactController extends ActiveController
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
         if($oneHashSettingStatus->is_enabled == OneHash::ONE_HASH_SETTING_OFF) {
 
+            //Get the OneHashToken from AWS Parameter Store
+            $aws = new AwsParameterStore();
+            $result = $aws->actionGetParameter($contact->created_by);
+
+            if($result['status']){
+                $oneHashToken = $result['oneHashTokenValue'];
+            }else{
+                return array("Error"=> $result['msg']);
+            }
+
             //Check contact present on OneHash or not
-            $contactName  =  $this->actionFindOnehashContact($contact->email,$contact->createdBy->onehash_token);
+            $contactName  =  $this->findOneHashContact($contact->email,$oneHashToken);
             if($contactName['status']){
                 // call onhash api
                 if (isset($conJson['image']) && !empty($conJson['image'])) {
@@ -319,18 +341,18 @@ class ContactController extends ActiveController
 
                 $file_url = '';
                 if (!empty($conJson['image'])) {
-                    $file_url = $this->actionOnehashImageUpdate($contact, $myImage);
+                    $file_url = $this->oneHashImageUpdate($contact, $myImage,$oneHashToken);
                 }
 
-                $response = $this->actionOnehashUpdate($contact, $myImage, $file_url);
+                $response = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
 
                 //  for Address Update  start
-                $address_title = $this->actionFindOnehashAddress($contact->email, $contact->createdBy->onehash_token);
-                $response = $this->actionOnehashAddressUpdate($contact, $address_title);
+                $address_title = $this->findOneHashAddress($contact->email, $oneHashToken);
+                $response = $this->oneHashAddressUpdate($contact, $address_title,$oneHashToken);
                 //  for Address Update  end
 
                 //  for Contact Update  start
-                $response = $this->actionOnehashContactUpdate($contact, $contactName['msg'], $file_url);
+                $response = $this->oneHashContactUpdate($contact, $contactName['msg'], $file_url,$oneHashToken);
                 //  for Contact Update  end
             }
         }
@@ -338,11 +360,11 @@ class ContactController extends ActiveController
         return ['status'=>true,"data"=>$contact];
     }
     
-    function actionOnehashUpdate($model, $image, $file_url)
+    function oneHashUpdate($model, $image, $file_url,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
         // $authToken = 'token 2afc7871897ea0f:70a48aafae0007f'
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
 
         $curl = curl_init();
 
@@ -413,11 +435,11 @@ class ContactController extends ActiveController
         }
     }
 
-    function actionOnehashImageUpdate($model, $image)
+    function oneHashImageUpdate($model, $image,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
 //         $authToken = 'token 2afc7871897ea0f:70a48aafae0007f';
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
 
         $curl = curl_init();
         $dataArray = array(
@@ -461,7 +483,7 @@ class ContactController extends ActiveController
     }
 
     //  find onehash address by email_id
-    function actionFindOnehashAddress($emailId,$authToken)
+    function findOneHashAddress($emailId,$authToken)
     {
         $authToken1 = 'token '.$authToken;
         $url = 'https://one.lookingforwardconsulting.com/api/resource/Address?filters=[["email_id","=",'.'"'.$emailId.'"'.']]';
@@ -500,9 +522,9 @@ class ContactController extends ActiveController
     }
 
     //  update onehash address by address title
-    function actionOnehashAddressUpdate($model,$address_title)
+    function oneHashAddressUpdate($model,$address_title,$oneHashToken)
     {
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
         $curl = curl_init();
 
         //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
@@ -552,7 +574,7 @@ class ContactController extends ActiveController
     }
 
     //  find onehash Contact by email_id
-    function actionFindOnehashContact($emailId,$authToken)
+    function findOneHashContact($emailId,$authToken)
     {
         $authToken1 = 'token '.$authToken;
         $url = 'https://one.lookingforwardconsulting.com/api/resource/Contact?filters=[["email_id","=",'.'"'.$emailId.'"'.']]';
@@ -599,9 +621,9 @@ class ContactController extends ActiveController
     }
 
     //  update onehash Contact by contact title
-    function actionOnehashContactUpdate($model,$contact_title,$file_url)
+    function oneHashContactUpdate($model,$contact_title,$file_url,$oneHashToken)
     {
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
         $curl = curl_init();
 
         //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
@@ -656,6 +678,18 @@ class ContactController extends ActiveController
             ];
         } else {
             return json_decode($response);
+        }
+    }
+
+    function actionWriteToCard(){
+        $post = file_get_contents("php://input");
+        $data = (array) \json_decode($post);
+        if(isset($data['code']) && $data['code'] != null) {
+            $data = Contact::find()->where(['code' =>$data['code']])->one();
+            Contact::writeVcard($data);
+            return(['msg' => 'card Updated']);
+        } else{
+            return(['msg' => 'Invalid Code']);
         }
     }
 }
