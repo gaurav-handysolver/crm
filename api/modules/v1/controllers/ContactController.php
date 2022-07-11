@@ -129,6 +129,10 @@ class ContactController extends ActiveController
             return $contact->getErrors();
         }
 
+        if(isset($conJson['action_type']) && $conJson['action_type'] == "save&write"){
+            Contact::writeVcard($contact);
+        }
+
         //Check the OneHash setting is one/off
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
         if($oneHashSettingStatus->is_enabled == OneHash::ONE_HASH_SETTING_OFF) {
@@ -313,6 +317,10 @@ class ContactController extends ActiveController
 
         if (!$contact->save()){
             return $contact->getErrors();
+        }
+
+        if(isset($conJson['action_type']) && $conJson['action_type'] == "save&write"){
+            Contact::writeVcard($contact);
         }
 
         //Check the OneHash setting is one/off

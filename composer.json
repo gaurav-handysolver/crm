@@ -78,7 +78,10 @@
   },
   "config": {
     "process-timeout": 1800,
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
+    }
   },
   "repositories": [
     {
