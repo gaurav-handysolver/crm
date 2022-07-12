@@ -129,9 +129,6 @@ class ContactController extends ActiveController
             return $contact->getErrors();
         }
 
-        if(isset($conJson['action_type']) && $conJson['action_type'] == "save&write"){
-            Contact::writeVcard($contact);
-        }
 
         //Check the OneHash setting is one/off
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
@@ -319,9 +316,6 @@ class ContactController extends ActiveController
             return $contact->getErrors();
         }
 
-        if(isset($conJson['action_type']) && $conJson['action_type'] == "save&write"){
-            Contact::writeVcard($contact);
-        }
 
         //Check the OneHash setting is one/off
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
@@ -689,15 +683,4 @@ class ContactController extends ActiveController
         }
     }
 
-    function actionWriteToCard(){
-        $post = file_get_contents("php://input");
-        $data = (array) \json_decode($post);
-        if(isset($data['code']) && $data['code'] != null) {
-            $data = Contact::find()->where(['code' =>$data['code']])->one();
-            Contact::writeVcard($data);
-            return(['msg' => 'card Updated']);
-        } else{
-            return(['msg' => 'Invalid Code']);
-        }
-    }
 }

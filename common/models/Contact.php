@@ -125,47 +125,10 @@ class Contact extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-
-//         $vcard = new VCard();
-//         $firstname = $this->firstname;
-//         $lastname = $this->lastname;
-//         $additional = '';
-//         $prefix = '';
-//         $suffix = '';
-
-//         $vcard->addAddress(
-//             '',
-//             '',
-//             $this->address ?? '',
-//             $this->city ?? '',
-//             $this->state ?? '',
-//             $this->pincode ?? '',
-//             $this->country ?? '',
-//             $this->address_type ?? ''
-//         );
-
-
-//         // add personal data
-//         $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
-//         if (!empty($this->imageUrl)){
-//             $vcard->addPhoto($this->imageUrl,true);
-//         }
-//         // add work data
-//         $vcard->addCompany($this->company);
-//         $vcard->addJobtitle($this->job_title);
-//         $vcard->addRole('');
-//         $vcard->addEmail($this->email);
-//         $vcard->addPhoneNumber($this->phone_number, 'PREF;HOME');
-//         $vcard->addPhoneNumber($this->mobile_number,'PREF;CELL');
-// //        $vcard->addAddress($this->address);
-//         $vcard->addURL($this->website);
-//         $vcard->setFilename($this->code,true);
-//         $vcard->setSavePath(Yii::getAlias('@storage').'/web/source');
-//         return $vcard->save();
+        $this->writeVcard($this);
     }
 
     public static function writeVcard($contact){
-
         $vcard = new VCard();
         $firstname = $contact->firstname;
         $lastname = $contact->lastname;
