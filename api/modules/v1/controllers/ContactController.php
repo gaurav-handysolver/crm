@@ -128,6 +128,9 @@ class ContactController extends BaseController
         }
 
         if (!$contact->save()){
+            if($contact->getErrors()['email']){
+                Yii::$app->response->statusCode = 500;
+            }
             return $contact->getErrors();
         }
 
