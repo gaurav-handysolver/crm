@@ -17,7 +17,7 @@
      * Time: 10:26
      */
 
-class ContactController extends ActiveController
+class ContactController extends BaseController
 {
     public $modelClass = Contact::class;
 
@@ -54,7 +54,9 @@ class ContactController extends ActiveController
     public function actionView($code)
     {
         $contact = Contact::find()->where(['code'=>$code])->one();
-
+        if($contact == null){
+            return array('status'=> 404,'msg'=>'Contact not found');
+        }
         if(!empty($contact->imageUrl)) {
             $contact->imageUrl .= '?nocache=' . time();
         }
