@@ -155,7 +155,7 @@ class SiteController extends \yii\web\Controller
         }
         print_r('Total Records fetched--> '.$totalRecord);
         ob_end_flush();
-
+        exit();
     }
 
     public function getDataFromOneHash($lead_id){
