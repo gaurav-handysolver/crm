@@ -48,14 +48,16 @@ class ContactController extends BaseController
             }
         }
 
-        return $contacts;
+        return ['status' => 1 , 'messege' => 'success', 'payload' => $contacts];
+        // return $contacts;
     }
 
     public function actionView($code)
     {
         $contact = Contact::find()->where(['code'=>$code])->one();
         if($contact == null){
-            return array('status'=> 404,'msg'=>'Contact not found');
+            return ['status' => 0 , 'messege' => 'not found', 'payload' => 'Contact not found'];
+            // return array('status'=> 404,'msg'=>'Contact not found');
         }
         if(!empty($contact->imageUrl)) {
             $contact->imageUrl .= '?nocache=' . time();
@@ -67,7 +69,8 @@ class ContactController extends BaseController
         if(empty($contact->country))
             $contact->country = 'United States';
 
-        return $contact;
+        return ['status' => 1 , 'messege' => 'success', 'payload' => $contact];
+        // return $contact;
     }
 
     public function actionCreate()
@@ -86,9 +89,9 @@ class ContactController extends BaseController
         }
 
         if(!isset($conJson['firstname']) || !isset($conJson['email'])){
-            return [
-                'error' => "firstname and email must be passed as POST params"
-            ];
+            Yii::$app->response->statusCode = 422;
+            return ['status' => 0 , 'messege' => 'missing required fields', 'payload' => 'firstname and email is required'];
+            // return ['error' => "firstname and email must be passed as POST params"];
         }
 
         $contact->firstname= $conJson['firstname'];
@@ -128,12 +131,15 @@ class ContactController extends BaseController
         }
 
         if (!$contact->save()){
-            if($contact->getErrors()['email']){
-                Yii::$app->response->statusCode = 500;
-            }
-            return $contact->getErrors();
+            // if($contact->getErrors()['lastname']){
+            //     echo 'at email error';
+            //     Yii::$app->response->statusCode = 500;
+            // }
+            // Yii::$app->response->statusCode = 422;
+            return ['status' => 0 , 'messege' => 'validaton failed', 'payload' => $contact->getErrors()];
         }
-
+//        return $contact;
+//        die();
 
         //Check the OneHash setting is one/off
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
@@ -155,7 +161,8 @@ class ContactController extends BaseController
 
             $contact->lead_id = $leadId;
             if (!$contact->save(true, ['lead_id'])) {
-                return $contact->getErrors();
+                return ['status' => 0 , 'messege' => 'some error occurred', 'payload' => $contact->getErrors()];
+                // return $contact->getErrors();
             }
 
             // add image in onehash
@@ -178,8 +185,8 @@ class ContactController extends BaseController
             }
             //  for Contact Update  end
         }
-
-        return $contact;
+        return ['status' => 1 , 'messege' => 'success', 'payload' => $contact];
+        // return $contact;
     }
 
     function oneHashCreate($model,$oneHashToken)
@@ -265,15 +272,13 @@ class ContactController extends BaseController
         $contact =Contact::find()->where(['code'=>$code])->one();
 
         if(!isset($contact)) {
-            return [
-                'error' => "Contact with passed code could not be found"
-            ];
+            return ['status' => 0 , 'messege' => 'not found', 'payload' => 'Contact with passed code could not be found'];
+            // return ['error' => "Contact with passed code could not be found"];
         }
 
         if(!isset($conJson['code']) || !isset($conJson['firstname']) || !isset($conJson['email'])){
-            return [
-                'error' => "code, firstname and email must be passed as POST params"
-            ];
+            return ['status' => 0 , 'messege' => 'missing required fields', 'payload' => 'firstname and email is required'];
+            // return ['error' => "code, firstname and email must be passed as POST params"];
         }
 
         $contact->code = strtolower(trim($conJson['code']));
@@ -318,7 +323,8 @@ class ContactController extends BaseController
 
 
         if (!$contact->save()){
-            return $contact->getErrors();
+            return ['status' => 0 , 'messege' => 'validation error', 'payload' => $contact->getErrors()];
+            // return $contact->getErrors();
         }
 
 
@@ -333,7 +339,8 @@ class ContactController extends BaseController
             if($result['status']){
                 $oneHashToken = $result['oneHashTokenValue'];
             }else{
-                return array("Error"=> $result['msg']);
+                return ['status' => 0 , 'messege' => 'aws parameter error', 'payload' => $result['msg']];
+                // return array("Error"=> $result['msg']);
             }
 
             //Check contact present on OneHash or not
@@ -363,8 +370,8 @@ class ContactController extends BaseController
                 //  for Contact Update  end
             }
         }
-
-        return ['status'=>true,"data"=>$contact];
+        return ['status' => 1 , 'messege' => 'success', 'payload' => $contact];
+        // return ['status'=>true,"data"=>$contact];
     }
     
     function oneHashUpdate($model, $image, $file_url,$oneHashToken)
