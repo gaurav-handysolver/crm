@@ -72,20 +72,26 @@ class UserController extends Controller
         if ($model->load(Yii::$app->request->post(), '') && $model->login()) {
             $jwt = $this->generateJwtToken($model->getUser()->email);
             $user = $model->getUser();
-            return [
+            return ['status' => 1, 'messege' => 'success', 'payload' => [
                 'id'=> $user->id,
                 'username'=> $user->username,
                 'access_token'=> $user->access_token,
                 'onehash_token' => $user->onehash_token,
                 'jwt_token' => $jwt
-            ];
+            ]];
+//            return [
+//                'id'=> $user->id,
+//                'username'=> $user->username,
+//                'access_token'=> $user->access_token,
+//                'onehash_token' => $user->onehash_token,
+//                'jwt_token' => $jwt
+//            ];
 //            return $model->getUser()->toArray(['id', 'username', 'access_token','onehash_token']);
         }
 
         Yii::$app->response->statusCode = 422;
-        return [
-            'errors' => $model->errors,
-        ];
+        return ['status' => 0, 'messege' => 'validation failed', 'payload' => $model->errors];
+//        return ['errors' => $model->errors,];
     }
 
     /**
