@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\OneHash;
+use common\components\awsParameterStore\AwsParameterStore;
 use common\components\onehash\OneHashService;
 use Yii;
 use common\models\Contact;
@@ -150,24 +151,35 @@ class ContactController extends Controller
                 //Check the OneHash setting is one/off
                 $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
                 if($oneHashSettingStatus->is_enabled == OneHash::ONE_HASH_SETTING_OFF){
+
+                    //Get the OneHashToken from AWS Parameter Store
+                    $aws = new AwsParameterStore();
+                    $result = $aws->actionGetParameter($model->created_by);
+
+                    if($result['status']){
+                        $oneHashToken = $result['oneHashTokenValue'];
+                    }else{
+                        return array("Error"=> $result['msg']);
+                    }
+
                     //Update the contact details on OneHas as well
                     $contact = new OneHashService();
                     $file_url='';
                     if($model->imageUrl!=''){
-                        $file_url = $contact->actionOnehashImageUpdate($model);
+                        $file_url = $contact->actionOnehashImageUpdate($model,$oneHashToken);
                     }
-                    $updateLeadData = $contact->actionOnehashUpdate($model,$logoFile,$file_url);
+                    $updateLeadData = $contact->actionOnehashUpdate($model,$logoFile,$file_url,$oneHashToken);
 
                     //  for Address Update  start
-                    $address_title = $contact->actionFindOnehashAddress($model->email,$model->createdBy->onehash_token);
+                    $address_title = $contact->actionFindOnehashAddress($model->email,$oneHashToken);
                     if($address_title['status']){
-                        $response = $contact->actionOnehashAddressUpdate($model,$address_title['data']);
+                        $response = $contact->actionOnehashAddressUpdate($model,$address_title['data'],$oneHashToken);
                     }
                     //  for Address Update  end
 
-                    $contact_title = $contact->actionFindOnehashContact($model->email,$model->createdBy->onehash_token);
+                    $contact_title = $contact->actionFindOnehashContact($model->email,$oneHashToken);
                     if($contact_title['status']){
-                        $updateOneHasData = $contact->actionOnehashContactUpdate($model,$contact_title['data'],$file_url);
+                        $updateOneHasData = $contact->actionOnehashContactUpdate($model,$contact_title['data'],$file_url,$oneHashToken);
                     }
                 }
 

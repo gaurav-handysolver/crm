@@ -47,14 +47,14 @@ class OneHashService
     }
 
     //Update contact image
-    function actionOnehashImageUpdate($model)
+    function actionOnehashImageUpdate($model,$oneHashToken)
     {
         $image = file_get_contents($model->imageUrl);
         $image = base64_encode($image);
 
         // $leadId = 'CRM-LEAD-2022-00078'
 //         $authToken = 'token 2afc7871897ea0f:70a48aafae0007f';
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
 
         $curl = curl_init();
         $dataArray = array(
@@ -104,9 +104,9 @@ class OneHashService
     }
 
     //  update onehash Contact by contact title
-    function actionOnehashContactUpdate($model,$contact_title,$file_url)
+    function actionOnehashContactUpdate($model,$contact_title,$file_url,$oneHashToken)
     {
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
         $curl = curl_init();
 
         //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
@@ -169,11 +169,11 @@ class OneHashService
     }
 
     //Lead update
-    function actionOnehashUpdate($model, $image, $file_url)
+    function actionOnehashUpdate($model, $image, $file_url,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
         // $authToken = 'token 2afc7871897ea0f:70a48aafae0007f'
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
 
         $curl = curl_init();
         $dataArray = array(
@@ -287,9 +287,9 @@ class OneHashService
     }
 
     //  update onehash address by address title
-    function actionOnehashAddressUpdate($model,$address_title)
+    function actionOnehashAddressUpdate($model,$address_title,$oneHashToken)
     {
-        $authToken = 'token '.$model->createdBy->onehash_token;
+        $authToken = 'token '.$oneHashToken;
         $curl = curl_init();
 
         //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
