@@ -10,6 +10,10 @@ namespace api\modules\v1\resources;
 
 class Contact extends \common\models\Contact
 {
+    CONST ERROR_STATUS_CODE = 0;
+    CONST SUCCESS_STATUS_CODE = 1;
+
+
     public function fields()
     {
         return ['id', 'firstname','lastname','email','mobile_number','company','website','notes','address','imageUrl','birthday','pollguru','buzz','learning_arcade','training_pipeline','leadership_edge','created_by','code','city','state','country','address_type','pincode','lead_id'];

@@ -3,6 +3,7 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\models\LoginForm;
+use api\modules\v1\resources\Contact;
 use common\models\User;
 use Firebase\JWT\JWT;
 use Yii;
@@ -72,11 +73,10 @@ class UserController extends Controller
         if ($model->load(Yii::$app->request->post(), '') && $model->login()) {
             $jwt = $this->generateJwtToken($model->getUser()->email);
             $user = $model->getUser();
-            return ['status' => 1, 'messege' => 'success', 'payload' => [
+            return ['status' => Contact::SUCCESS_STATUS_CODE, 'message' => 'success', 'payload' => [
                 'id'=> $user->id,
                 'username'=> $user->username,
                 'access_token'=> $user->access_token,
-                'onehash_token' => $user->onehash_token,
                 'jwt_token' => $jwt
             ]];
 //            return [
@@ -90,7 +90,7 @@ class UserController extends Controller
         }
 
         Yii::$app->response->statusCode = 422;
-        return ['status' => 0, 'messege' => 'validation failed', 'payload' => $model->errors];
+        return ['status' => 0, 'message' => 'Validation failed', 'payload' => $model->errors];
 //        return ['errors' => $model->errors,];
     }
 

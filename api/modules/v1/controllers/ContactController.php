@@ -48,7 +48,7 @@ class ContactController extends BaseController
             }
         }
 
-        return ['status' => 1 , 'messege' => 'success', 'payload' => $contacts];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contacts];
         // return $contacts;
     }
 
@@ -56,7 +56,7 @@ class ContactController extends BaseController
     {
         $contact = Contact::find()->where(['code'=>$code])->one();
         if($contact == null){
-            return ['status' => 0 , 'messege' => 'not found', 'payload' => 'Contact not found'];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => 'Contact not found'];
             // return array('status'=> 404,'msg'=>'Contact not found');
         }
         if(!empty($contact->imageUrl)) {
@@ -69,7 +69,7 @@ class ContactController extends BaseController
         if(empty($contact->country))
             $contact->country = 'United States';
 
-        return ['status' => 1 , 'messege' => 'success', 'payload' => $contact];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contact];
         // return $contact;
     }
 
@@ -90,7 +90,7 @@ class ContactController extends BaseController
 
         if(!isset($conJson['firstname']) || !isset($conJson['email'])){
             Yii::$app->response->statusCode = 422;
-            return ['status' => 0 , 'messege' => 'missing required fields', 'payload' => 'firstname and email is required'];
+            return ['status' => 0 , 'message' => 'missing required fields', 'payload' => 'firstname and email is required'];
             // return ['error' => "firstname and email must be passed as POST params"];
         }
 
@@ -136,7 +136,7 @@ class ContactController extends BaseController
             //     Yii::$app->response->statusCode = 500;
             // }
             // Yii::$app->response->statusCode = 422;
-            return ['status' => 0 , 'messege' => 'validaton failed', 'payload' => $contact->getErrors()];
+            return ['status' => 0 , 'message' => 'Validaton failed', 'payload' => $contact->getErrors()];
         }
 //        return $contact;
 //        die();
@@ -161,7 +161,7 @@ class ContactController extends BaseController
 
             $contact->lead_id = $leadId;
             if (!$contact->save(true, ['lead_id'])) {
-                return ['status' => 0 , 'messege' => 'some error occurred', 'payload' => $contact->getErrors()];
+                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'some error occurred', 'payload' => $contact->getErrors()];
                 // return $contact->getErrors();
             }
 
@@ -185,7 +185,7 @@ class ContactController extends BaseController
             }
             //  for Contact Update  end
         }
-        return ['status' => 1 , 'messege' => 'success', 'payload' => $contact];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contact];
         // return $contact;
     }
 
@@ -272,12 +272,12 @@ class ContactController extends BaseController
         $contact =Contact::find()->where(['code'=>$code])->one();
 
         if(!isset($contact)) {
-            return ['status' => 0 , 'messege' => 'not found', 'payload' => 'Contact with passed code could not be found'];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => 'Contact with passed code could not be found'];
             // return ['error' => "Contact with passed code could not be found"];
         }
 
         if(!isset($conJson['code']) || !isset($conJson['firstname']) || !isset($conJson['email'])){
-            return ['status' => 0 , 'messege' => 'missing required fields', 'payload' => 'firstname and email is required'];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'missing required fields', 'payload' => 'firstname and email is required'];
             // return ['error' => "code, firstname and email must be passed as POST params"];
         }
 
@@ -323,7 +323,7 @@ class ContactController extends BaseController
 
 
         if (!$contact->save()){
-            return ['status' => 0 , 'messege' => 'validation error', 'payload' => $contact->getErrors()];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation error', 'payload' => $contact->getErrors()];
             // return $contact->getErrors();
         }
 
@@ -339,7 +339,7 @@ class ContactController extends BaseController
             if($result['status']){
                 $oneHashToken = $result['oneHashTokenValue'];
             }else{
-                return ['status' => 0 , 'messege' => 'aws parameter error', 'payload' => $result['msg']];
+                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'aws parameter error', 'payload' => $result['msg']];
                 // return array("Error"=> $result['msg']);
             }
 
@@ -370,7 +370,7 @@ class ContactController extends BaseController
                 //  for Contact Update  end
             }
         }
-        return ['status' => 1 , 'messege' => 'success', 'payload' => $contact];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contact];
         // return ['status'=>true,"data"=>$contact];
     }
     
