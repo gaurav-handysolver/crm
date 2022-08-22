@@ -56,7 +56,13 @@ class ContactController extends BaseController
     {
         $contact = Contact::find()->where(['code'=>$code])->one();
         if($contact == null){
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => 'Contact not found'];
+
+            $error = ['code' => 'Contact not found'];
+
+            //Save the error in system log
+            Yii::error($error,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => $error];
             // return array('status'=> 404,'msg'=>'Contact not found');
         }
         if(!empty($contact->imageUrl)) {
@@ -90,7 +96,18 @@ class ContactController extends BaseController
 
         if(!isset($conJson['firstname']) || !isset($conJson['email'])){
             Yii::$app->response->statusCode = 422;
-            return ['status' => 0 , 'message' => 'missing required fields', 'payload' => 'firstname and email is required'];
+
+            if(!isset($conJson['firstname']) && isset($conJson['email'])){
+                $result = ['firstname' => 'firstname is required'];
+            }elseif (!isset($conJson['email']) && isset($conJson['firstname'])){
+                $result = ['email' => 'email is required'];
+            }else{
+                $result = ['firstname' => 'firstname is required', 'email' => 'email is required'];
+            }
+            //Save the error in system log
+            Yii::error($result,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'missing required fields', 'payload' => $result];
             // return ['error' => "firstname and email must be passed as POST params"];
         }
 
@@ -136,7 +153,13 @@ class ContactController extends BaseController
             //     Yii::$app->response->statusCode = 500;
             // }
             // Yii::$app->response->statusCode = 422;
-            return ['status' => 0 , 'message' => 'Validaton failed', 'payload' => $contact->getErrors()];
+            foreach($contact->getErrors() as $key => $values) {
+                $validationErrors[$key] = implode(',',$values);
+            }
+            //Save the error in system log
+            Yii::error($validationErrors,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation failed', 'payload' => $contact->getErrors()?$validationErrors:''];
         }
 //        return $contact;
 //        die();
@@ -272,12 +295,37 @@ class ContactController extends BaseController
         $contact =Contact::find()->where(['code'=>$code])->one();
 
         if(!isset($contact)) {
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => 'Contact with passed code could not be found'];
+            $error = ['code' => 'Contact with passed code could not be found'];
+
+            //Save the error in system log
+            Yii::error($error,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => $error];
             // return ['error' => "Contact with passed code could not be found"];
         }
 
         if(!isset($conJson['code']) || !isset($conJson['firstname']) || !isset($conJson['email'])){
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'missing required fields', 'payload' => 'firstname and email is required'];
+
+            if(!isset($conJson['code']) && isset($conJson['firstname']) && isset($conJson['email'])){
+                $result = ['code' => 'code is required'];
+            }elseif (isset($conJson['code']) && !isset($conJson['firstname']) && isset($conJson['email'])){
+                $result = ['firstname' => 'firstname is required'];
+            }elseif (isset($conJson['code']) && isset($conJson['firstname']) && !isset($conJson['email'])){
+                $result = ['email' => 'email is required'];
+            }elseif (!isset($conJson['code']) && !isset($conJson['firstname']) && isset($conJson['email'])){
+                $result = ['code' => 'code is required','firstname' => 'firstname is required'];
+            }elseif (isset($conJson['code']) && !isset($conJson['firstname']) && !isset($conJson['email'])){
+                $result = ['firstname' => 'firstname is required','email' => 'email is required',];
+            }elseif (!isset($conJson['code']) && isset($conJson['firstname']) && !isset($conJson['email'])){
+                $result = ['code' => 'code is required','email' => 'email is required',];
+            }else{
+                $result = ['code' => 'code is required','firstname' => 'firstname is required', 'email' => 'email is required'];
+            }
+
+            //Save the error in system log
+            Yii::error($result,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'missing required fields', 'payload' => $result];
             // return ['error' => "code, firstname and email must be passed as POST params"];
         }
 
@@ -323,7 +371,14 @@ class ContactController extends BaseController
 
 
         if (!$contact->save()){
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation error', 'payload' => $contact->getErrors()];
+
+            foreach($contact->getErrors() as $key => $values) {
+                $validationErrors[$key] = implode(',',$values);
+            }
+            //Save the error in system log
+            Yii::error($validationErrors,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation error', 'payload' => $contact->getErrors()?$validationErrors:''];
             // return $contact->getErrors();
         }
 

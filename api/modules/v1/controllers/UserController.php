@@ -90,7 +90,17 @@ class UserController extends Controller
         }
 
         Yii::$app->response->statusCode = 422;
-        return ['status' => 0, 'message' => 'Validation failed', 'payload' => $model->errors];
+        if($model->getErrors()){
+            foreach($model->getErrors() as $key => $values) {
+                $validationErrors[$key] = implode(',',$values);
+            }
+
+            //Save the error in system log
+            Yii::error($validationErrors,'CRM APIs');
+
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation failed', 'payload' => $model->getErrors()?$validationErrors:''];
+        }
+
 //        return ['errors' => $model->errors,];
     }
 
