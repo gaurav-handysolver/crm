@@ -13,6 +13,9 @@ class Contact extends \common\models\Contact
     CONST ERROR_STATUS_CODE = 0;
     CONST SUCCESS_STATUS_CODE = 1;
 
+    CONST SUCCESS_RESPONSE = 200;
+    CONST REDIRECT_RESPONSE = 301;
+
 
     public function fields()
     {
