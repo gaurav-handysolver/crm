@@ -94,16 +94,25 @@ class ContactController extends BaseController
             $contact->code= strtolower(trim($conJson['code']));
         }
 
-        if(!isset($conJson['firstname']) || !isset($conJson['email'])){
+        if(!isset($conJson['firstname']) || !isset($conJson['email']) || !isset($conJson['lead_id'])){
             Yii::$app->response->statusCode = 422;
 
-            if(!isset($conJson['firstname']) && isset($conJson['email'])){
+            if(!isset($conJson['firstname']) && isset($conJson['email']) && isset($conJson['lead_id'])){
                 $result = ['firstname' => 'firstname is required'];
-            }elseif (!isset($conJson['email']) && isset($conJson['firstname'])){
+            }elseif (isset($conJson['firstname']) && !isset($conJson['email']) && isset($conJson['lead_id'])){
                 $result = ['email' => 'email is required'];
+            }elseif (isset($conJson['firstname']) && isset($conJson['email']) && !isset($conJson['lead_id'])){
+                $result = ['lead_id' => 'lead id is required'];
+            }elseif (isset($conJson['firstname']) && !isset($conJson['email']) && !isset($conJson['lead_id'])){
+                $result = ['email' => 'email is required', 'lead_id' => 'lead id is required'];
+            }elseif (!isset($conJson['firstname']) && isset($conJson['email']) && !isset($conJson['lead_id'])){
+                $result = ['firstname' => 'firstname is required', 'lead_id' => 'lead id is required'];
+            }elseif (!isset($conJson['firstname']) && !isset($conJson['email']) && isset($conJson['lead_id'])){
+                $result = ['firstname' => 'firstname is required', 'email' => 'email is required'];
             }else{
                 $result = ['firstname' => 'firstname is required', 'email' => 'email is required'];
             }
+
             //Save the error in system log
             Yii::error($result,'CRM APIs');
 
@@ -210,8 +219,11 @@ class ContactController extends BaseController
                 }
             }
 
-            //This api returning 301 response code in both success and error situation so, we are not logging this api error
-            $response = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
+            $oneHashUpdateContact = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
+            if(!$oneHashUpdateContact['status']){
+                Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
+                return $oneHashUpdateContact;
+            }
 
             //  for Contact Update  start
             $oneHashFindApiResponse = $this->findOneHashContact($contact->email, $oneHashToken);
@@ -450,8 +462,11 @@ class ContactController extends BaseController
                     }
                 }
 
-                //This api returning 301 response code in both success and error situation so, we are not logging this api error
-                $response = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
+                $oneHashUpdateContact = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
+                if(!$oneHashUpdateContact['status']){
+                    Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
+                    return $oneHashUpdateContact;
+                }
 
                 //  for Address Update  start
                 $oneHashFindAddressResponse = $this->findOneHashAddress($contact->email, $oneHashToken);
@@ -486,7 +501,6 @@ class ContactController extends BaseController
         // return ['status'=>true,"data"=>$contact];
     }
 
-    //this api return 301 status code in both success and error situation so, we are not logging this api error
     function oneHashUpdate($model, $image, $file_url,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
@@ -548,10 +562,13 @@ class ContactController extends BaseController
         ));
 
         $response = curl_exec($curl);
+        //Getting the response code of curl request
         $httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
+
         $err = curl_error($curl);
 
         curl_close($curl);
+
 
         if ($err) {
             Yii::error("Contact update oneHash API curl error #:" . $err);
@@ -559,7 +576,12 @@ class ContactController extends BaseController
                 'error' => "Contact update oneHash API curl error"
             ];
         } else {
-            return json_decode($response);
+            if($httpCode == Contact::SUCCESS_RESPONSE){
+                return array('status' => true, 'msg' => 'Contact is updated on onehash', 'payload' => json_decode($response));
+            }else{
+                $functionName = 'OneHash-Update function';
+                return array('status' => false, 'msg' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+            }
         }
     }
 

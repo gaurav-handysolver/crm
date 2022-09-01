@@ -199,7 +199,6 @@ class OneHashService
     }
 
     //Lead update
-    //This api returning 301 response code in both success and error situation so, we are not logging this api error
     function actionOnehashUpdate($model, $image, $file_url,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
@@ -260,6 +259,9 @@ class OneHashService
         ));
 
         $response = curl_exec($curl);
+        //Getting the response code of curl request
+        $httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
+
         $err = curl_error($curl);
 
         curl_close($curl);
@@ -271,8 +273,12 @@ class OneHashService
                 'error' => "Contact update oneHash API curl error"
             ];
         } else {
-            $result = ["status"=>true, "data"=>json_decode($response)];
-            return $result;
+            if($httpCode == Contact::SUCCESS_RESPONSE){
+                return array('status' => true, 'msg' => 'Contact is updated on onehash', 'payload' => json_decode($response));
+            }else{
+                $functionName = 'OneHash-Update function';
+                return array('status' => false, 'msg' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+            }
         }
     }
 

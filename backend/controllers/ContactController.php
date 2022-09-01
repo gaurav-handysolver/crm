@@ -174,8 +174,11 @@ class ContactController extends Controller
                             return $oneHashImageApiResponse;
                         }
                     }
-                    //This api returning 301 response code in both success and error situation so, we are not logging this api error
-                    $updateLeadData = $contact->actionOnehashUpdate($model,$logoFile,$file_url,$oneHashToken);
+                    $oneHashUpdateContact = $contact->actionOnehashUpdate($model,$logoFile,$file_url,$oneHashToken);
+                    if(!$oneHashUpdateContact['status']){
+                        Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
+                        return $oneHashUpdateContact;
+                    }
 
                     //  for Address Update  start
                     $oneHashFindAddressResponse = $contact->actionFindOnehashAddress($model->email,$oneHashToken);
