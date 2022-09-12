@@ -94,21 +94,13 @@ class ContactController extends BaseController
             $contact->code= strtolower(trim($conJson['code']));
         }
 
-        if(!isset($conJson['firstname']) || !isset($conJson['email']) || !isset($conJson['lead_id'])){
+        if(!isset($conJson['firstname']) || !isset($conJson['email'])){
             Yii::$app->response->statusCode = 422;
 
-            if(!isset($conJson['firstname']) && isset($conJson['email']) && isset($conJson['lead_id'])){
+            if(!isset($conJson['firstname']) && isset($conJson['email'])){
                 $result = ['firstname' => 'firstname is required'];
-            }elseif (isset($conJson['firstname']) && !isset($conJson['email']) && isset($conJson['lead_id'])){
+            }elseif (isset($conJson['firstname']) && !isset($conJson['email'])){
                 $result = ['email' => 'email is required'];
-            }elseif (isset($conJson['firstname']) && isset($conJson['email']) && !isset($conJson['lead_id'])){
-                $result = ['lead_id' => 'lead id is required'];
-            }elseif (isset($conJson['firstname']) && !isset($conJson['email']) && !isset($conJson['lead_id'])){
-                $result = ['email' => 'email is required', 'lead_id' => 'lead id is required'];
-            }elseif (!isset($conJson['firstname']) && isset($conJson['email']) && !isset($conJson['lead_id'])){
-                $result = ['firstname' => 'firstname is required', 'lead_id' => 'lead id is required'];
-            }elseif (!isset($conJson['firstname']) && !isset($conJson['email']) && isset($conJson['lead_id'])){
-                $result = ['firstname' => 'firstname is required', 'email' => 'email is required'];
             }else{
                 $result = ['firstname' => 'firstname is required', 'email' => 'email is required'];
             }

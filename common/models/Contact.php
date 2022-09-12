@@ -58,7 +58,7 @@ class Contact extends \yii\db\ActiveRecord
         return [
             [['email','code'], 'unique'],
             [['email'], 'email'],
-            [['firstname','email','code','lead_id'],'required'],
+            [['firstname','email','code'],'required'],
             [['birthday', 'updated_at', 'created_at'], 'safe'],
             [['pollguru', 'buzz', 'learning_arcade', 'training_pipeline', 'leadership_edge', 'created_by'], 'integer'],
             [['firstname', 'lastname', 'email', 'company'], 'string', 'max' => 50],
