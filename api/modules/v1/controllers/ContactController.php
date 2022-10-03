@@ -364,6 +364,11 @@ class ContactController extends BaseController
             // return ['error' => "code, firstname and email must be passed as POST params"];
         }
 
+        //To Update the email Id on onehash platform we have to use old email id for finding the user
+        if(isset($contact)){
+            $oldEmailId = $contact->email;
+        }
+
         $contact->code = strtolower(trim($conJson['code']));
         $contact->firstname= $conJson['firstname'];
         $contact->email= $conJson['email'];
@@ -434,7 +439,7 @@ class ContactController extends BaseController
             }
 
             //Check contact present on OneHash or not
-            $oneHashFindApiResponse =  $this->findOneHashContact($contact->email,$oneHashToken);
+            $oneHashFindApiResponse =  $this->findOneHashContact($oldEmailId,$oneHashToken);
             if($oneHashFindApiResponse['status']){
                 // call onehash api
                 if (isset($conJson['image']) && !empty($conJson['image'])) {
@@ -454,6 +459,7 @@ class ContactController extends BaseController
                     }
                 }
 
+                //Update the lead's information that is associated with contact
                 $oneHashUpdateContact = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
                 if(!$oneHashUpdateContact['status']){
                     Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
@@ -461,7 +467,7 @@ class ContactController extends BaseController
                 }
 
                 //  for Address Update  start
-                $oneHashFindAddressResponse = $this->findOneHashAddress($contact->email, $oneHashToken);
+                $oneHashFindAddressResponse = $this->findOneHashAddress($oldEmailId, $oneHashToken);
                 if($oneHashFindAddressResponse['status']){
                     $oneHashAddressUpdateResponse = $this->oneHashAddressUpdate($contact, $oneHashFindAddressResponse['payload'],$oneHashToken);
                     // The response of contact address update's api is not using further so, we only target the error situation.
@@ -474,6 +480,7 @@ class ContactController extends BaseController
                     return $oneHashFindAddressResponse;
                 }
                 //  for Address Update  end
+
 
                 //  for Contact Update  start
                 $oneHashContactUpdateResponse = $this->oneHashContactUpdate($contact, $oneHashFindApiResponse['payload'], $file_url,$oneHashToken);
@@ -699,6 +706,8 @@ class ContactController extends BaseController
             "country"=> $model->country ?: "United States",
             "pincode"=> $model->pincode ?: "NA",
             "phone"=> $model->phone_number,
+            "email_id" => $model->email
+
         );
         $data = json_encode($dataArray);
         curl_setopt_array($curl, array(
@@ -811,6 +820,12 @@ class ContactController extends BaseController
             "last_name"=> $model->lastname,
             "company_name"=> $model->company,
             "image"=>$file_url,
+            "email_ids" => [
+                [
+                    "email_id" => $model->email,
+                    "is_primary" => 1
+                ]
+            ],
             "phone_nos" => [
                 [
                     "phone" => $model->phone_number,

@@ -140,6 +140,12 @@ class OneHashService
             "last_name"=> $model->lastname,
             "company_name"=> $model->company,
             "image"=>$file_url,
+            "email_ids" => [
+                 [
+                  "email_id" => $model->email,
+                  "is_primary" => 1
+                    ]
+            ],
             "phone_nos" => [
                 [
                     "phone" => $model->phone_number,
@@ -350,6 +356,7 @@ class OneHashService
             "country"=> $model->country ?: "United States",
             "pincode"=> $model->pincode ?: "NA",
             "phone"=> $model->phone_number,
+            "email_id" => $model->email
         );
         $data = json_encode($dataArray);
         curl_setopt_array($curl, array(

@@ -59,7 +59,7 @@ class AwsParameterStore
         $awsApiKey = env("AWS_API_KEY");
 
         $post = file_get_contents("php://input");
-        $postData = (array) \ json_decode($post);
+        $postData = (array)  json_decode($post);
 
         if(!isset($postData['key']) || !isset($postData['value'])){
             return array("Status"=>false, "msg"=>"Key and value are required");
