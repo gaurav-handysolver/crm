@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\OneHash;
 use common\components\awsParameterStore\AwsParameterStore;
 use common\components\onehash\OneHashService;
+use common\components\onehash\OneHashServiceNew;
 use Yii;
 use common\models\Contact;
 use backend\models\search\ContactSearch;
@@ -117,6 +118,20 @@ class ContactController extends Controller
             $this->layout='businesscard';
         }
         $model =Contact::find()->where(['code'=>$code])->andWhere(['email'=>strtolower($email)])->one();
+
+        //Get the OneHashToken from AWS Parameter Store
+//        $aws = new AwsParameterStore();
+//        $result = $aws->actionGetParameter($model->created_by);
+//
+//        if($result['status']){
+//            $oneHashToken = $result['oneHashTokenValue'];
+//        }else{
+//            return array("Error"=> $result['msg']);
+//        }
+//        //Update the contact details on OneHas as well
+//        $contact = new OneHashServiceNew();
+//        $oneHashFindApiResponse = $contact->actionFindOnehashContact($model->email,$oneHashToken);
+
 //        for Input Validation : Start
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -168,50 +183,24 @@ class ContactController extends Controller
                         return array("Error"=> $result['msg']);
                     }
                     //Update the contact details on OneHas as well
-                    $contact = new OneHashService();
+                    //Update the contact details on OneHas as well
+                    $contact = new OneHashServiceNew();
                     $file_url='';
-                    $oneHashFindApiResponse = $contact->actionFindOnehashContact($oldEmailId,$oneHashToken);
-                    if($oneHashFindApiResponse['status']){
-                        if($model->imageUrl!=''){
-                            $oneHashImageApiResponse = $contact->actionOnehashImageUpdate($model,$oneHashToken);
-                            if($oneHashImageApiResponse['status']){
-                                $file_url = $oneHashImageApiResponse['payload'];
-                            }else{
-                                yii::error($oneHashImageApiResponse,'ONEHASH APIs');
-                                return $oneHashImageApiResponse;
-                            }
-                        }
-                    //Update the lead's info that is associated with contact
-                    $oneHashUpdateContact = $contact->actionOnehashUpdate($model,$logoFile,$file_url,$oneHashToken);
-                    if(!$oneHashUpdateContact['status']){
-                        Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
-                        return $oneHashUpdateContact;
+                    if($model->imageUrl!=''){
+                        $file_url = $contact->actionOnehashImageUpdate($model,$oneHashToken);
                     }
+                    $updateLeadData = $contact->actionOnehashUpdate($model,$logoFile,$file_url,$oneHashToken);
 
-                        //  for Address Update  start
-                        $oneHashFindAddressResponse = $contact->actionFindOnehashAddress($oldEmailId,$oneHashToken);
-                        if($oneHashFindAddressResponse['status']){
-                            $oneHashAddressUpdateResponse = $contact->actionOnehashAddressUpdate($model,$oneHashFindAddressResponse['payload'],$oneHashToken);
-                            // The response of contact address update's api is not using further so, we only target the error situation.
-                            if(!$oneHashAddressUpdateResponse['status']){
-                                Yii::error($oneHashAddressUpdateResponse,'ONEHASH APIs');
-                                return $oneHashAddressUpdateResponse;
-                            }
-                        }else{
-                            Yii::error($oneHashFindAddressResponse, 'ONEHASH APIs');
-                            return $oneHashFindAddressResponse;
-                        }
-                        //  for Address Update  end
+                    //  for Address Update  start
+                    $address_title = $contact->actionFindOnehashAddress($model->email,$oneHashToken);
+                    if($address_title['status']){
+                        $response = $contact->actionOnehashAddressUpdate($model,$address_title['data'],$oneHashToken);
+                    }
+                    //  for Address Update  end
 
-                        $oneHashContactUpdateResponse = $contact->actionOnehashContactUpdate($model,$oneHashFindApiResponse['payload'],$file_url,$oneHashToken);
-                        if(!$oneHashContactUpdateResponse['status']){
-                            Yii::error($oneHashContactUpdateResponse, 'ONEHASH APIs');
-                            return $oneHashContactUpdateResponse;
-                        }
-
-                    }else{
-                        Yii::error($oneHashFindApiResponse, 'ONEHASH APIs');
-                        return $oneHashFindApiResponse;
+                    $contact_title = $contact->actionFindOnehashContact($model->email,$oneHashToken);
+                    if($contact_title['status']){
+                        $updateOneHasData = $contact->actionOnehashContactUpdate($model,$contact_title['data'],$file_url,$oneHashToken);
                     }
 
                 }
@@ -229,6 +218,7 @@ class ContactController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+//            'status' => $oneHashFindApiResponse['status']
         ]);
     }
 

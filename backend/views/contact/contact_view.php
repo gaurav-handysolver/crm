@@ -177,7 +177,7 @@ $this->title = $model->firstname." ".$model->lastname;
             <div class="d-flex">
                 <div class="user__image">
                     <?php if(isset($model->imageUrl)){ ?>
-                        <img src=<?= $model->imageUrl ?> alt="user-image" class="img-fluid">
+                        <img src=<?= $model->imageUrl. '?nocache='. time() ?>   alt="user-image" class="img-fluid">
                     <?php }else{  ?>
                         <img src='https://crm.lookingforwardconsulting.com/backend/web/img/anonymous.png' alt="user-image" class="img-fluid">
                     <?php } ?>

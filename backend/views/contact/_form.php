@@ -9,6 +9,7 @@ use yii\helpers\Url;
  * @var yii\web\View $this
  * @var common\models\Contact $model
  * @var yii\bootstrap4\ActiveForm $form
+ * @var string $status
  */
 ?>
 
@@ -131,7 +132,20 @@ use yii\helpers\Url;
             </div>
         </div>
         <div class="text-center card-footer">
-            <?php echo Html::submitButton($model->isNewRecord ? Yii::t('backend', 'Create') : Yii::t('backend', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+<!--            --><?php
+//              if(!$model->isNewRecord){
+//                  if(!$status){
+//                   $disabled = 'disabled';
+//                   $title = "Update is currently disabled for your profile. Please contact support.";
+//                  }else{
+//                      $disabled = '';
+//                      $title = "Update Contact";
+//                  }
+//              }else{
+//                  $title = "Create Contact";
+//              }
+//            ?>
+            <?php echo Html::submitButton($model->isNewRecord ? Yii::t('backend', 'Create') : Yii::t('backend', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary ']) ?>
         </div>
         <br>
         <br>

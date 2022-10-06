@@ -136,9 +136,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         'template' => '{view} {update} {copy} {delete}',
                         'buttons' => [
                             'copy' => function($url, $model, $key){
-                                return Html::button('<i class="copy-to-clipboard fa fa-clipboard" data-url="'.Url::to(['contact/auth-contact', 'code' => $model->code],true).'" id="copyBtn" "></i>',['class'=>'btn btn-primary btn-xs','title'=>'Copy Link']);
+                                return Html::button('<i class="copy-to-clipboard fa fa-clipboard" data-url="'.Url::to(['contact/auth-contact', 'code' => $model->code],true).'" id="copyBtn" "></i>',['class'=>'btn btn-primary btn-xs clipboard','title'=>'Copy Link','data-url' => Url::to(['contact/auth-contact', 'code' => $model->code],true)]);
                             },
 
+                        ],
+                          'visibleButtons' => [
+                            'update' => function ($model, $key, $index) {
+                                return $model->checkContact($model);
+                             },
+                              'copy' => function ($model, $key, $index) {
+                                  return $model->checkContact($model);
+                              },
                         ],
                         'urlCreator' => function ($action, $model, $key, $index) {
                             if ($action === 'view') {
@@ -168,7 +176,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <script>
 
-    document.querySelectorAll(".copy-to-clipboard").forEach(button => {
+    document.querySelectorAll(".clipboard").forEach(button => {
         button.addEventListener('click', (event) => {
     var link = event.target.dataset.url;
     copyText(link);
