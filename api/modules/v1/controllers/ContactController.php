@@ -221,13 +221,10 @@ class ContactController extends BaseController
             $oneHashFindApiResponse = $this->findOneHashContact($contact->email, $oneHashToken);
             if($oneHashFindApiResponse['status']){
                 $oneHashContactUpdateResponse = $this->oneHashContactUpdate($contact, $oneHashFindApiResponse['payload'], $file_url,$oneHashToken);
-                if($oneHashContactUpdateResponse['status']){
-                    return $oneHashContactUpdateResponse;
-                }else{
+                if(!$oneHashContactUpdateResponse['status']){
                     Yii::error($oneHashContactUpdateResponse, 'ONEHASH APIs');
                     return $oneHashContactUpdateResponse;
                 }
-
             }else{
                 Yii::error($oneHashFindApiResponse, 'ONEHASH APIs');
                 return $oneHashFindApiResponse;
@@ -484,9 +481,7 @@ class ContactController extends BaseController
 
                 //  for Contact Update  start
                 $oneHashContactUpdateResponse = $this->oneHashContactUpdate($contact, $oneHashFindApiResponse['payload'], $file_url,$oneHashToken);
-                if($oneHashContactUpdateResponse['status']){
-                    return $oneHashContactUpdateResponse;
-                }else{
+                if(!$oneHashContactUpdateResponse['status']){
                     Yii::error($oneHashContactUpdateResponse, 'ONEHASH APIs');
                     return $oneHashContactUpdateResponse;
                 }
