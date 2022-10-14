@@ -157,6 +157,7 @@ use yii\helpers\Url;
 <!--/////////////-->
 
 <!-- some CSS styling changes and overrides -->
+<!--Hello Gaurav-->
 <style>
     .kv-avatar .krajee-default.file-preview-frame,.kv-avatar .krajee-default.file-preview-frame:hover {
         margin: 0;
