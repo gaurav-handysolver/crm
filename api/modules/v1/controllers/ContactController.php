@@ -48,7 +48,7 @@ class ContactController extends BaseController
             }
         }
 
-        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contacts];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contacts];
         // return $contacts;
     }
 
@@ -62,7 +62,7 @@ class ContactController extends BaseController
             //Save the error in system log
             Yii::error($error,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => $error];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Contact not found', 'payload' => $error];
             // return array('status'=> 404,'msg'=>'Contact not found');
         }
         if(!empty($contact->imageUrl)) {
@@ -75,7 +75,7 @@ class ContactController extends BaseController
         if(empty($contact->country))
             $contact->country = 'United States';
 
-        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contact];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contact];
         // return $contact;
     }
 
@@ -108,7 +108,7 @@ class ContactController extends BaseController
             //Save the error in system log
             Yii::error($result,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'missing required fields', 'payload' => $result];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Missing required fields', 'payload' => $result];
             // return ['error' => "firstname and email must be passed as POST params"];
         }
 
@@ -176,7 +176,9 @@ class ContactController extends BaseController
             if($result['status']){
                $oneHashToken = $result['oneHashTokenValue'];
             }else{
-                return array("Error"=> $result['msg']);
+                Yii::error($result,'AWS APIs');
+                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'AWS parameter error', 'payload' => $result['msg']];
+//                return array("Error"=> $result['msg']);
             }
 
             $oneHashCreateContactResponse = $this->oneHashCreate($contact,$oneHashToken);
@@ -190,7 +192,7 @@ class ContactController extends BaseController
 
 
             if (!$contact->save(true, ['lead_id'])) {
-                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'some error occurred', 'payload' => $contact->getErrors()];
+                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Some error occurred', 'payload' => $contact->getErrors()];
                 // return $contact->getErrors();
             }
 
@@ -231,7 +233,7 @@ class ContactController extends BaseController
             }
             //  for Contact Update  end
         }
-        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contact];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contact];
         // return $contact;
     }
 
@@ -301,10 +303,10 @@ class ContactController extends BaseController
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'msg' => 'Contact is created on onehash', 'payload' => json_decode($response)->data->name);
+                return array('status' => true, 'message' => 'Contact is created on onehash', 'payload' => json_decode($response)->data->name);
             }else{
                 $functionName = 'OneHash-Create function';
-                return array('status' => false, 'msg' => 'Contact is not created on onehash with response code  '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'contact is not created on onehash','payload' => 'Contact is not created on onehash with response code  '.$httpCode .' in '.$functionName. 'and the error is '.$response);
 
             }
         }
@@ -332,7 +334,7 @@ class ContactController extends BaseController
             //Save the error in system log
             Yii::error($error,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'not found', 'payload' => $error];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Contact not found', 'payload' => $error];
             // return ['error' => "Contact with passed code could not be found"];
         }
 
@@ -357,7 +359,7 @@ class ContactController extends BaseController
             //Save the error in system log
             Yii::error($result,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'missing required fields', 'payload' => $result];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Missing required fields', 'payload' => $result];
             // return ['error' => "code, firstname and email must be passed as POST params"];
         }
 
@@ -431,7 +433,8 @@ class ContactController extends BaseController
             if($result['status']){
                 $oneHashToken = $result['oneHashTokenValue'];
             }else{
-                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'aws parameter error', 'payload' => $result['msg']];
+                Yii::error($result,'AWS APIs');
+                return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'AWS parameter error', 'payload' => $result['msg']];
                 // return array("Error"=> $result['msg']);
             }
 
@@ -491,7 +494,7 @@ class ContactController extends BaseController
                 return $oneHashFindApiResponse;
             }
         }
-        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'success', 'payload' => $contact];
+        return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contact];
         // return ['status'=>true,"data"=>$contact];
     }
 
@@ -565,16 +568,16 @@ class ContactController extends BaseController
 
 
         if ($err) {
-            Yii::error("Contact update oneHash API curl error #:" . $err);
+            Yii::error("Lead update oneHash API curl error #:" . $err);
             return [
-                'error' => "Contact update oneHash API curl error"
+                'error' => "Lead update oneHash API curl error"
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'msg' => 'Contact is updated on onehash', 'payload' => json_decode($response));
+                return array('status' => true, 'message' => 'Lead is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Update function';
-                return array('status' => false, 'msg' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'Lead is not updated on onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -626,10 +629,10 @@ class ContactController extends BaseController
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'msg' => 'Contact image updated on onehash', 'payload' => json_decode($response)->message->file_url);
+                return array('status' => true, 'message' => 'Contact image updated on onehash', 'payload' => json_decode($response)->message->file_url);
             }else{
                 $functionName = 'OneHash-Image-Update function';
-                return array('status' => false, 'msg' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'Contact image is not updated on onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -667,16 +670,16 @@ class ContactController extends BaseController
 
         curl_close($curl);
         if ($err) {
-            Yii::error("Lead-Address Getting oneHash API curl error #:" . $err);
+            Yii::error("Contact-Address Getting oneHash API curl error #:" . $err);
             return [
-                'error' => "Lead-Address Getting oneHash API curl error"
+                'error' => "Contact-Address Getting oneHash API curl error"
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'msg' => 'Lead address is found', 'payload' => json_decode($response)->data[0]->name);
+                return array('status' => true, 'message' => 'Contact address is found', 'payload' => json_decode($response)->data[0]->name);
             }else{
                 $functionName = 'Find-OneHash-Address function';
-                return array('status' => false, 'msg' => 'Lead address is not found with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'Contact address is not found','payload' => 'Contact address is not found with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
 
             }
         }
@@ -736,10 +739,10 @@ class ContactController extends BaseController
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'msg' => 'Contact address is updated on onehash', 'payload' => json_decode($response));
+                return array('status' => true, 'message' => 'Contact address is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Address-Update function';
-                return array('status' => false, 'msg' => 'Contact address is not updated on onehash with response code  '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'Contact address is not updated on onehash','payload' => 'Contact address is not updated on onehash with response code  '.$httpCode .' in '.$functionName. ' and the error is '. $response);
 
             }
         }
@@ -789,13 +792,13 @@ class ContactController extends BaseController
                 $data = json_decode($response)->data;
                 if(isset($data) && !empty($data)){
                     $contactName = $data[0]->name;
-                    return array('status'=>true,'msg' => 'Contact found', 'payload' => $contactName);
+                    return array('status'=>true,'message' => 'Contact found on onehash', 'payload' => $contactName);
                 }else{
-                    return array('status'=>false,'msg'=>'Contact not found','payload' => 'Contact not found');
+                    return array('status'=>false,'message'=>'Contact not found on onehash','payload' => 'Contact not found');
                 }
             }else{
                 $functionName = 'Find-OneHash-Contact function';
-                return array('status' => false, 'msg' => 'Onehash API Error with response code with response code  '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'Contact not found on onehash','payload' => 'Onehash API Error with response code with response code  '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -867,10 +870,10 @@ class ContactController extends BaseController
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'msg' => 'Contact is updated', 'payload' => json_decode($response));
+                return array('status' => true, 'message' => 'Contact is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Contact-Update function';
-                return array('status' => false, 'msg' => 'Contact is not updated with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => false, 'message' => 'Contact is not updated on onehash','payload' => 'Contact is not updated with response code '.$httpCode .' in '.$functionName.' and the error is ' .$response);
 
             }
         }
