@@ -149,6 +149,7 @@ class ContactController extends BaseController
         }
 
         if (!$contact->save()){
+            $errorDescription = '';
             // if($contact->getErrors()['lastname']){
             //     echo 'at email error';
             //     Yii::$app->response->statusCode = 500;
@@ -156,11 +157,12 @@ class ContactController extends BaseController
             // Yii::$app->response->statusCode = 422;
             foreach($contact->getErrors() as $key => $values) {
                 $validationErrors[$key] = implode(',',$values);
+                $errorDescription = $errorDescription . implode(',' , $values);
             }
             //Save the error in system log
             Yii::error($validationErrors,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation failed', 'payload' => $contact->getErrors()?$validationErrors:''];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => str_replace('\\', ' ', $errorDescription), 'payload' => $contact->getErrors()?$validationErrors:''];
         }
 //        return $contact;
 //        die();
@@ -410,14 +412,15 @@ class ContactController extends BaseController
 
 
         if (!$contact->save()){
-
+            $errorDescription = '';
             foreach($contact->getErrors() as $key => $values) {
                 $validationErrors[$key] = implode(',',$values);
+                $errorDescription = $errorDescription . implode(',' ,$values);
             }
             //Save the error in system log
             Yii::error($validationErrors,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation error', 'payload' => $contact->getErrors()?$validationErrors:''];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => str_replace('\\', ' ', $errorDescription), 'payload' => $contact->getErrors()?$validationErrors:''];
             // return $contact->getErrors();
         }
 
