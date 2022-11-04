@@ -19,6 +19,6 @@ class Contact extends \common\models\Contact
 
     public function fields()
     {
-        return ['id', 'firstname','lastname','email','mobile_number','company','website','notes','address','imageUrl','birthday','pollguru','buzz','learning_arcade','training_pipeline','leadership_edge','created_by','code','city','state','country','address_type','pincode','lead_id'];
+        return ['id', 'firstname','lastname','email','job_title','mobile_number','phone_number','company','website','notes','address','imageUrl','birthday','pollguru','buzz','learning_arcade','training_pipeline','leadership_edge','created_by','code','city','state','country','address_type','pincode','lead_id'];
     }
 }
