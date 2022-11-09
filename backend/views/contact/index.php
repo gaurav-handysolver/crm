@@ -142,10 +142,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                           'visibleButtons' => [
                             'update' => function ($model, $key, $index) {
-                                return $model->checkContact($model);
+                                return \backend\controllers\ContactController::checkContact($model);
                              },
                               'copy' => function ($model, $key, $index) {
-                                  return $model->checkContact($model);
+                                  return \backend\controllers\ContactController::checkContact($model);
                               },
                         ],
                         'urlCreator' => function ($action, $model, $key, $index) {

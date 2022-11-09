@@ -45,9 +45,11 @@ use Yii;
  */
 class Contact extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
+
     public static function tableName()
     {
         return 'tbl_contact';
@@ -188,22 +190,6 @@ class Contact extends \yii\db\ActiveRecord
         return new ContactQuery(get_called_class());
     }
 
-    public static function checkContact($model){
-        //Get the OneHashToken from AWS Parameter Store
-        $aws = new AwsParameterStore();
-        $result = $aws->actionGetParameter($model->created_by);
-
-        if($result['status']){
-            $oneHashToken = $result['oneHashTokenValue'];
-        }else{
-            return array("Error"=> $result['msg']);
-        }
-        //Update the contact details on OneHas as well
-        $oneHashFindApiResponse = self::findOnehashContact($model->email,$oneHashToken);
-
-        return $oneHashFindApiResponse['status'];
-    }
-
     public static function findOnehashContact($emailId,$authToken)
     {
         $authToken1 = 'token '.$authToken;
@@ -246,6 +232,59 @@ class Contact extends \yii\db\ActiveRecord
                 $data = json_decode($response)->data;
                 if(isset($data) && !empty($data)){
                     $contactName = $data[0]->name;
+                    return array('status'=>true,'msg' => 'Contact found', 'payload' => $contactName);
+                }else{
+                    return array('status'=>false,'msg'=>'Contact not found','payload' => 'Contact not found');
+                }
+            }else{
+                $functionName = 'Find-OneHash-Contact function';
+                return array('status' => false, 'msg' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+            }
+        }
+    }
+
+    public static function getOneHashLeads($authToken){
+        $authToken1 = 'token '.$authToken;
+        $url = 'https://one.lookingforwardconsulting.com/api/resource/Lead?limit_page_length=4000&fields=["email_id"]';
+
+        $curl = curl_init();
+
+        //set false to run api in localhost using curl, otherwise it will throw SSL certification expire issue
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL =>$url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: ${authToken1}",
+                "cache-control: no-cache",
+                "content-type: application/json",
+            ),
+        ));
+        $response = curl_exec($curl);
+        //Getting the response of http code of onehash API
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        $err = curl_error($curl);
+
+        curl_close($curl);
+        if ($err) {
+            Yii::error("Lead-Address Getting oneHash API curl error #:" . $err);
+            return [
+                'status'=>false,
+                'error' => "Lead-Address Getting oneHash API curl error"
+            ];
+        } else {
+            if($httpCode == \api\modules\v1\resources\Contact::SUCCESS_RESPONSE){
+                $data = json_decode($response)->data;
+                if(isset($data) && !empty($data)){
+                    $contactName = $data;
                     return array('status'=>true,'msg' => 'Contact found', 'payload' => $contactName);
                 }else{
                     return array('status'=>false,'msg'=>'Contact not found','payload' => 'Contact not found');
