@@ -26,7 +26,45 @@ use yii\widgets\ActiveForm;
  */
 class ContactController extends Controller
 {
+   public static $leadEmails = [];
 
+    public function init(){
+
+        //Get the OneHashToken from AWS Parameter Store
+        $aws = new AwsParameterStore();
+        $result = $aws->actionGetParameter(5);
+
+        if($result['status']){
+            $oneHashToken = $result['oneHashTokenValue'];
+        }else{
+            return array("Error"=> $result['msg']);
+        }
+
+        //Update the contact details on OneHas as well
+        $getAllLeadsResponse = Contact::getOneHashLeads($oneHashToken);
+        if($getAllLeadsResponse['status']){
+            foreach ($getAllLeadsResponse['payload'] as $res){
+                array_push(self::$leadEmails, $res->email_id);
+            }
+        }else{
+            Yii::error($getAllLeadsResponse,'ONEHASH APIs');
+        }
+
+        parent::init();
+
+    }
+
+    public static function checkContact($model){
+        if(count(self::$leadEmails) > 0){
+            foreach (self::$leadEmails as $leadEmail){
+                if($model->email === $leadEmail){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     /** @inheritdoc */
     public function behaviors()
     {
