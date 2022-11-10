@@ -33,13 +33,6 @@ class ContactController extends BaseController
 
     public function actionIndex()
     {
-        /*$activeData = new ActiveDataProvider([
-            'query' => Contact::find()->orderBy('firstname'),
-            'pagination' => false
-        ]);
-
-        return $activeData;*/
-
         $contacts = Contact::find()->orderBy('firstname')->all();
 
         foreach($contacts as $contact) {
@@ -49,7 +42,6 @@ class ContactController extends BaseController
         }
 
         return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contacts];
-        // return $contacts;
     }
 
     public function actionView($code)
@@ -63,7 +55,6 @@ class ContactController extends BaseController
             Yii::error($error,'CRM APIs');
 
             return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Contact not found', 'payload' => $error];
-            // return array('status'=> 404,'msg'=>'Contact not found');
         }
         if(!empty($contact->imageUrl)) {
             $contact->imageUrl .= '?nocache=' . time();
@@ -76,9 +67,9 @@ class ContactController extends BaseController
             $contact->country = 'United States';
 
         return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contact];
-        // return $contact;
     }
 
+    //In create action, we have to just call the lead create API and the data will automatically add in contact doctype and address doctype
     public function actionCreate()
     {
         $code = strtolower(substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',ceil(6/strlen($x)))),1,6));
@@ -109,7 +100,6 @@ class ContactController extends BaseController
             Yii::error($result,'CRM APIs');
 
             return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Missing required fields', 'payload' => $result];
-            // return ['error' => "firstname and email must be passed as POST params"];
         }
 
         $contact->firstname= $conJson['firstname'];
@@ -149,21 +139,16 @@ class ContactController extends BaseController
         }
 
         if (!$contact->save()){
-            // if($contact->getErrors()['lastname']){
-            //     echo 'at email error';
-            //     Yii::$app->response->statusCode = 500;
-            // }
-            // Yii::$app->response->statusCode = 422;
+            $errorDescription = '';
             foreach($contact->getErrors() as $key => $values) {
                 $validationErrors[$key] = implode(',',$values);
+                $errorDescription = $errorDescription . implode(',' , $values);
             }
             //Save the error in system log
             Yii::error($validationErrors,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation failed', 'payload' => $contact->getErrors()?$validationErrors:''];
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => str_replace('\\', ' ', $errorDescription), 'payload' => $contact->getErrors()?$validationErrors:''];
         }
-//        return $contact;
-//        die();
 
         //Check the OneHash setting is one/off
         $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
@@ -171,7 +156,7 @@ class ContactController extends BaseController
 
             //Get the OneHashToken from AWS Parameter Store
             $aws = new AwsParameterStore();
-            $result = $aws->actionGetParameter($contact->created_by);
+            $result = $aws->actionGetParameter(\common\models\Contact::USER_ACCOUNT_FOR_TESTING);
 
             if($result['status']){
                $oneHashToken = $result['oneHashTokenValue'];
@@ -211,25 +196,6 @@ class ContactController extends BaseController
                     yii::error($oneHashImageApiResponse,'ONEHASH APIs');
                     return $oneHashImageApiResponse;
                 }
-            }
-
-            $oneHashUpdateContact = $this->oneHashUpdate($contact, $myImage, $file_url,$oneHashToken);
-            if(!$oneHashUpdateContact['status']){
-                Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
-                return $oneHashUpdateContact;
-            }
-
-            //  for Contact Update  start
-            $oneHashFindApiResponse = $this->findOneHashContact($contact->email, $oneHashToken);
-            if($oneHashFindApiResponse['status']){
-                $oneHashContactUpdateResponse = $this->oneHashContactUpdate($contact, $oneHashFindApiResponse['payload'], $file_url,$oneHashToken);
-                if(!$oneHashContactUpdateResponse['status']){
-                    Yii::error($oneHashContactUpdateResponse, 'ONEHASH APIs');
-                    return $oneHashContactUpdateResponse;
-                }
-            }else{
-                Yii::error($oneHashFindApiResponse, 'ONEHASH APIs');
-                return $oneHashFindApiResponse;
             }
             //  for Contact Update  end
         }
@@ -320,6 +286,7 @@ class ContactController extends BaseController
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    //In update action, we have to lead, contact and address APIs. data will not automatically update in contact doctype and address doctype
     public function actionUpdate($code)
     {
 
@@ -335,7 +302,6 @@ class ContactController extends BaseController
             Yii::error($error,'CRM APIs');
 
             return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Contact not found', 'payload' => $error];
-            // return ['error' => "Contact with passed code could not be found"];
         }
 
         if(!isset($conJson['code']) || !isset($conJson['firstname']) || !isset($conJson['email'])){
@@ -360,7 +326,6 @@ class ContactController extends BaseController
             Yii::error($result,'CRM APIs');
 
             return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Missing required fields', 'payload' => $result];
-            // return ['error' => "code, firstname and email must be passed as POST params"];
         }
 
         //To Update the email Id on onehash platform we have to use old email id for finding the user
@@ -410,15 +375,15 @@ class ContactController extends BaseController
 
 
         if (!$contact->save()){
-
+            $errorDescription = '';
             foreach($contact->getErrors() as $key => $values) {
                 $validationErrors[$key] = implode(',',$values);
+                $errorDescription = $errorDescription . implode(',' ,$values);
             }
             //Save the error in system log
             Yii::error($validationErrors,'CRM APIs');
 
-            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'Validation error', 'payload' => $contact->getErrors()?$validationErrors:''];
-            // return $contact->getErrors();
+            return ['status' => Contact::ERROR_STATUS_CODE , 'message' => str_replace('\\', ' ', $errorDescription), 'payload' => $contact->getErrors()?$validationErrors:''];
         }
 
 
@@ -428,14 +393,13 @@ class ContactController extends BaseController
 
             //Get the OneHashToken from AWS Parameter Store
             $aws = new AwsParameterStore();
-            $result = $aws->actionGetParameter($contact->created_by);
+            $result = $aws->actionGetParameter(\common\models\Contact::USER_ACCOUNT_FOR_TESTING);
 
             if($result['status']){
                 $oneHashToken = $result['oneHashTokenValue'];
             }else{
                 Yii::error($result,'AWS APIs');
                 return ['status' => Contact::ERROR_STATUS_CODE , 'message' => 'AWS parameter error', 'payload' => $result['msg']];
-                // return array("Error"=> $result['msg']);
             }
 
             //Check contact present on OneHash or not
@@ -495,7 +459,6 @@ class ContactController extends BaseController
             }
         }
         return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contact];
-        // return ['status'=>true,"data"=>$contact];
     }
 
     function oneHashUpdate($model, $image, $file_url,$oneHashToken)
@@ -826,12 +789,12 @@ class ContactController extends BaseController
             ],
             "phone_nos" => [
                 [
-                    "phone" => $model->phone_number,
+                    "phone" => $model->phone_number?$model->phone_number:0,
                     "is_primary_phone" => 1,
                     "is_primary_mobile_no"=> 0
                 ],
                 [
-                    "phone" => $model->mobile_number,
+                    "phone" => $model->mobile_number?$model->mobile_number:0,
                     "is_primary_phone" => 0,
                     "is_primary_mobile_no" => 1
                 ]
