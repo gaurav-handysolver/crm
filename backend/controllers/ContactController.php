@@ -32,7 +32,7 @@ class ContactController extends Controller
 
         //Get the OneHashToken from AWS Parameter Store
         $aws = new AwsParameterStore();
-        $result = $aws->actionGetParameter(5);
+        $result = $aws->actionGetParameter(Contact::USER_ACCOUNT_FOR_TESTING);
 
         if($result['status']){
             $oneHashToken = $result['oneHashTokenValue'];
@@ -213,7 +213,7 @@ class ContactController extends Controller
 
                     //Get the OneHashToken from AWS Parameter Store
                     $aws = new AwsParameterStore();
-                    $result = $aws->actionGetParameter($model->created_by);
+                    $result = $aws->actionGetParameter(Contact::USER_ACCOUNT_FOR_TESTING);
 
                     if($result['status']){
                         $oneHashToken = $result['oneHashTokenValue'];

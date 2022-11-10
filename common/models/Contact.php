@@ -45,7 +45,8 @@ use Yii;
  */
 class Contact extends \yii\db\ActiveRecord
 {
-
+    //This is the test account
+    CONST USER_ACCOUNT_FOR_TESTING = 17;
     /**
      * {@inheritdoc}
      */
