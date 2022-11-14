@@ -34,7 +34,7 @@ class ContactController extends BaseController
 
     public function actionIndex()
     {
-        $contacts = Contact::find()->orderBy('firstname')->all();
+        $contacts = Contact::find()->indexBy('firstname')->orderBy('firstname')->all();
 
         foreach($contacts as $contact) {
             if(!empty($contact->imageUrl)) {
