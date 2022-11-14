@@ -233,7 +233,7 @@ class ContactController extends Controller
                             }
                         }
                     //Update the lead's info that is associated with contact
-                    $oneHashUpdateContact = OneHashService::OneHashUpdate($model,$logoFile,$file_url,$oneHashToken);
+                    $oneHashUpdateContact = OneHashService::OneHashLeadUpdate($model,$logoFile,$file_url,$oneHashToken);
                     if(!$oneHashUpdateContact['status']){
                         Yii::error($oneHashUpdateContact, 'ONEHASH APIs');
                         return $oneHashUpdateContact;
@@ -412,7 +412,7 @@ class ContactController extends Controller
 
             $contact = Contact::findOne($_GET['id']);
 
-            $contact_title = $contact->firstname. ' '.$contact->lastname;
+            $contactTitle = $contact->firstname. ' '.$contact->lastname;
 
             //Get the OneHashToken from AWS Parameter Store
             $aws = new AwsParameterStore();
@@ -432,7 +432,7 @@ class ContactController extends Controller
 
             $oneHashService = new OneHashService();
 
-            $oneHashCreateContactResponse = OneHashService::OneHashCreate($contact, $oneHashToken);
+            $oneHashCreateContactResponse = OneHashService::OneHashLeadCreate($contact, $oneHashToken);
             if($oneHashCreateContactResponse['status']){
                 // add lead id to db returned from onehash
                 $contact->lead_id = $oneHashCreateContactResponse['payload'];
@@ -473,7 +473,7 @@ class ContactController extends Controller
                     }
 
                     //Upload image on contact doctype
-                    $oneHashContactUpdateResponse = OneHashService::OneHashUpdateImageOnContact($contact, $contact_title, $file_url,$oneHashToken);
+                    $oneHashContactUpdateResponse = OneHashService::OneHashUpdateImageOnContact($contact, $contactTitle, $file_url,$oneHashToken);
                     if(!$oneHashContactUpdateResponse['status']){
                         Yii::error($oneHashContactUpdateResponse, 'ONEHASH APIs');
                         Yii::$app->session->setFlash('alert', [

@@ -209,7 +209,7 @@ class OneHashService
     }
 
     //Lead update
-    public static function OneHashUpdate($model, $image, $file_url,$oneHashToken)
+    public static function OneHashLeadUpdate($model, $image, $file_url,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
         // $authToken = 'token 2afc7871897ea0f:70a48aafae0007f'
@@ -405,7 +405,7 @@ class OneHashService
     }
 
     //Lead create
-    public static function OneHashCreate($model,$oneHashToken)
+    public static function OneHashLeadCreate($model,$oneHashToken)
     {
         // $leadId = 'CRM-LEAD-2022-00078'
 //        $authToken = 'token 2afc7871897ea0f:70a48aafae0007f';
