@@ -144,10 +144,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
                                 if($oneHashSettingStatus->is_enabled != OneHash::ONE_HASH_SETTING_OFF){
                                     $disabled = 'disabled';
-                                    $btnTitle = 'Onehash is disconnect';
+                                    $btnTitle = 'Onehash is disconnected';
                                 }else{
                                     $disabled = '';
-                                    $btnTitle = 'Add record on Onehash';
+                                    $btnTitle = 'Add record to Onehash';
                                 }
                                 return Html::button('<i class="fas fa-sync-alt" data-url="'.Url::to(['contact/add-record-onehash', 'id' => $model->id],true).'"  id="syncBtn"></i>',['class'=>'btn btn-primary btn-xs syncBtn '.$disabled,'title'=>$btnTitle,'data-url' => Url::to(['contact/add-record-onehash', 'id' => $model->id],true)]);
 
@@ -209,7 +209,7 @@ $this->params['breadcrumbs'][] = $this->title;
        button.addEventListener("click", (event) => {
            var link = event.target.dataset.url;
            var syncIcon = event.target;
-           if(confirm('Are you sure you want to add record on Onehash?')){
+           if(confirm('Are you sure want to add this record to Onehash?')){
 
                button.setAttribute("disabled", true);
                syncIcon.setAttribute("disabled", true);
