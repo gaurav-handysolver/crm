@@ -1,8 +1,10 @@
 <?php
 
+use backend\models\OneHash;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
+use yii\widgets\Pjax;
 
 /**
  * @var yii\web\View $this
@@ -21,8 +23,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="card-body p-0">
             <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-            <?php echo GridView::widget([
+        <?php Pjax::begin(['id' => 'contact-record']); ?>
+             <?php echo GridView::widget([
                 'layout' => "{items}\n{pager}",
                 'options' => [
                     'class' => ['gridview', 'table-responsive'],
@@ -133,11 +135,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     'code',
                     [
                         'class' => \common\widgets\ActionColumn::class,
-                        'template' => '{view} {update} {copy} {delete}',
+                        'template' => '{view} {update} {copy} {delete} {sync}',
                         'buttons' => [
                             'copy' => function($url, $model, $key){
                                 return Html::button('<i class="copy-to-clipboard fa fa-clipboard" data-url="'.Url::to(['contact/auth-contact', 'code' => $model->code],true).'" id="copyBtn" "></i>',['class'=>'btn btn-primary btn-xs clipboard','title'=>'Copy Link','data-url' => Url::to(['contact/auth-contact', 'code' => $model->code],true)]);
                             },
+                            'sync' => function($url, $model, $key){
+                                $oneHashSettingStatus = OneHash::find()->where(['setting_name'=>OneHash::ONE_HASH_SETTING_NAME])->one();
+                                if($oneHashSettingStatus->is_enabled != OneHash::ONE_HASH_SETTING_OFF){
+                                    $disabled = 'disabled';
+                                    $btnTitle = 'Onehash is disconnect';
+                                }else{
+                                    $disabled = '';
+                                    $btnTitle = 'Add record on Onehash';
+                                }
+                                return Html::button('<i class="fas fa-sync-alt" data-url="'.Url::to(['contact/add-record-onehash', 'id' => $model->id],true).'"  id="syncBtn"></i>',['class'=>'btn btn-primary btn-xs syncBtn '.$disabled,'title'=>$btnTitle,'data-url' => Url::to(['contact/add-record-onehash', 'id' => $model->id],true)]);
+
+                            }
 
                         ],
                           'visibleButtons' => [
@@ -147,6 +161,9 @@ $this->params['breadcrumbs'][] = $this->title;
                               'copy' => function ($model, $key, $index) {
                                   return \backend\controllers\ContactController::checkContact($model);
                               },
+                              'sync' => function($model, $key, $index){
+                                  return !\backend\controllers\ContactController::checkContact($model);
+                              }
                         ],
                         'urlCreator' => function ($action, $model, $key, $index) {
                             if ($action === 'view') {
@@ -166,6 +183,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ]); ?>
 
+            <?php Pjax::end(); ?>
+
         </div>
         <div class="card-footer">
             <?php echo getDataProviderSummary($dataProvider) ?>
@@ -179,11 +198,48 @@ $this->params['breadcrumbs'][] = $this->title;
     document.querySelectorAll(".clipboard").forEach(button => {
         button.addEventListener('click', (event) => {
     var link = event.target.dataset.url;
+    console.log(event);
     copyText(link);
     // navigator.clipboard.writeText(link);
     // alert("");
     })
-    })
+    });
+
+    document.querySelectorAll(".syncBtn").forEach(button => {
+       button.addEventListener("click", (event) => {
+           var link = event.target.dataset.url;
+           var syncIcon = event.target;
+           if(confirm('Are you sure you want to add record on Onehash?')){
+
+               button.setAttribute("disabled", true);
+               syncIcon.setAttribute("disabled", true);
+               syncIcon.classList.toggle('down');
+
+               $.ajax({
+                   url: link,
+                   type: 'GET',
+                   success: function(result){
+                     if(result.status){
+                         button.removeAttribute("disabled");
+                         syncIcon.removeAttribute("disabled");
+                         //pjax reload
+                         location.reload();
+                         // $.pjax.reload({container: '#contact-record', timeout: 2000});
+                     }else{
+                         console.log(result);
+                         syncIcon.classList.toggle('down');
+                         button.setAttribute("disabled", true);
+                         syncIcon.setAttribute("disabled", true);
+                         location.reload();
+
+                     }
+                   }
+               });
+           }
+
+
+       })
+    });
 
     async function copyText(link){
         await navigator.clipboard.writeText(link).then(()=>{
@@ -194,3 +250,25 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
 </script>
+
+<style>
+
+    #syncBtn.down{
+        -moz-transform:rotate(180deg);
+        -webkit-transform:rotate(180deg);
+        transform:rotate(180deg);
+        animation: rotate-animation 2s infinite linear;
+
+    }
+    @keyframes rotate-animation {
+        0% {
+            transform: rotate(0deg);
+        }
+        50% {
+            transform: rotate(180deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
