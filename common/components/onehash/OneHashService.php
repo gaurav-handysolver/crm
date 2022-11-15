@@ -152,12 +152,12 @@ class OneHashService
             ],
             "phone_nos" => [
                 [
-                    "phone" => $model->phone_number,
+                    "phone" => $model->phone_number?$model->phone_number:0,
                     "is_primary_phone" => 1,
                     "is_primary_mobile_no"=> 0
                 ],
                 [
-                    "phone" => $model->mobile_number,
+                    "phone" => $model->mobile_number?$model->mobile_number:0,
                     "is_primary_phone" => 0,
                     "is_primary_mobile_no" => 1
                 ]
