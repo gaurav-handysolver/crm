@@ -209,34 +209,37 @@ $this->params['breadcrumbs'][] = $this->title;
        button.addEventListener("click", (event) => {
            var link = event.target.dataset.url;
            var syncIcon = event.target;
-           if(confirm('Are you sure want to add this record to Onehash?')){
+           if(button.classList.contains('disabled')){
+               alert('Onehash is disconnected from CRM');
+           }else{
+               if(confirm('Are you sure want to add this record to Onehash?')){
 
-               button.setAttribute("disabled", true);
-               syncIcon.setAttribute("disabled", true);
-               syncIcon.classList.toggle('down');
+                   button.setAttribute("disabled", true);
+                   syncIcon.setAttribute("disabled", true);
+                   syncIcon.classList.toggle('down');
 
-               $.ajax({
-                   url: link,
-                   type: 'GET',
-                   success: function(result){
-                     if(result.status){
-                         button.removeAttribute("disabled");
-                         syncIcon.removeAttribute("disabled");
-                         //pjax reload
-                         location.reload();
-                         // $.pjax.reload({container: '#contact-record', timeout: 2000});
-                     }else{
-                         console.log(result);
-                         syncIcon.classList.toggle('down');
-                         button.setAttribute("disabled", true);
-                         syncIcon.setAttribute("disabled", true);
-                         location.reload();
+                   $.ajax({
+                       url: link,
+                       type: 'GET',
+                       success: function(result){
+                         if(result.status){
+                             button.removeAttribute("disabled");
+                             syncIcon.removeAttribute("disabled");
+                             //pjax reload
+                             location.reload();
+                             // $.pjax.reload({container: '#contact-record', timeout: 2000});
+                         }else{
+                             console.log(result);
+                             syncIcon.classList.toggle('down');
+                             button.setAttribute("disabled", true);
+                             syncIcon.setAttribute("disabled", true);
+                             location.reload();
 
-                     }
-                   }
-               });
+                         }
+                       }
+                   });
+               }
            }
-
 
        })
     });
