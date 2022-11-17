@@ -20,8 +20,15 @@ use yii\web\NotFoundHttpException;
 /**
  * @author Eugene Terentev <eugene@terentev.net>
  */
+
+/**
+ * Class UserController
+ */
+
 class UserController extends Controller
 {
+    protected $username;
+    protected $password;
     /**
      * @return array
      */
@@ -63,9 +70,51 @@ class UserController extends Controller
         return  $resource;
     }
 
-
     /**
-     * @return array
+     * @SWG\Info(version="1.0", title="Simple API"),
+     * @SWG\Post(path="/api/web/v1/user/login",
+     *     @SWG\Parameter(
+     *      in = "body",
+     *     name = "body",
+     *     required = true,
+     *     description = "User Login",
+     *     @SWG\Schema(
+     *        @SWG\Definition(required = {"username", "password"}),
+     *        @SWG\Property(property = "username", type = "string", example = "abc@gmail.com"),
+     *        @SWG\Property(property = "password", type = "string", example = "abc123"),
+     *     )
+     * ),
+     *     tags={"User"},
+     *     summary="User Login.",
+     *     @SWG\Response(
+     *         response = 200,
+     *         description = "Success",
+     *         @SWG\Schema(type = "object",
+     *           @SWG\Property(property = "status", type = "boolean", example = "1"),
+     *           @SWG\Property(property = "message", type = "string", example = "success"),
+     *           @SWG\Property(property = "payload", type = "object",
+     *              @SWG\Property(property = "id", type = "integer", example = 11),
+     *              @SWG\Property(property = "username", type = "string", example = "abc@gmail.com"),
+     *              @SWG\Property(property = "access_token", type = "string", example = "pHDrn2qwSWgIgLXJ9RunkuddeCKnUKekwgyr1gmE"),
+     *              @SWG\Property(property = "jwt_token", type = "string", example = "eyJ0eXAiOiJKV1QiLCJhbGc....0ifQ"),
+     *           ),
+     *         ),
+     *     ),
+     *
+     *
+     *     @SWG\Response(
+     *       response = 422,
+     *       description = "Validation failed",
+     *       @SWG\Schema(type = "object",
+     *         @SWG\Property(property="status", type="boolean", example = "0"),
+     *         @SWG\Property(property = "message", type = "string", example = "Validation failed"),
+     *         @SWG\Property(property = "payload", type = "object",
+     *           @SWG\Property(property="password", type="string", example = "Incorrect username or password / Password cannot be blank"),
+     *           @SWG\Property(property="email", type="string", example = "Email cannot be blank."),
+     *         )
+     *      )
+     *  )
+     * )
      */
     public function actionLogin()
     {

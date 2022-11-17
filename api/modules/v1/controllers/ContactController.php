@@ -32,6 +32,21 @@ class ContactController extends BaseController
         return $actions;
     }
 
+    /**
+     * @SWG\Get (path = "/api/webcontact/index",
+     *     tags = {"contact"},
+     *     summary = "Get the list of all contact",
+     *     @SWG\Response (
+     *       response = 200,
+     *       description = "List of all courses response",
+     *     @SWG\Schema(ref = "#/definitions/Contact")
+     *
+     *          )
+     *     )
+     *   )
+     *
+     * )
+     */
     public function actionIndex()
     {
         $contacts = Contact::find()->orderBy('firstname')->all();
