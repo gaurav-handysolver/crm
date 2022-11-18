@@ -93,6 +93,12 @@ $config = [
                 'allow' => true,
                 'roles' => ['?'],
             ],
+            [
+                'controllers' => ['swagger'],
+                'allow' => true,
+                'roles' => ['?'],
+                'actions' => ['docs', 'json-schema'],
+            ],
         ],
     ],
 ];

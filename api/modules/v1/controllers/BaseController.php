@@ -9,6 +9,15 @@ use yii\rest\Controller;
 use yii;
 use yii\web\HttpException;
 
+/**
+ * @SWG\SecurityScheme(
+ *   securityDefinition="Bearer",
+ *   type="apiKey",
+ *   in="header",
+ *   name="Authorization",
+ *   description = "Click the link to see how to pass JWT token https://share.getcloudapp.com/NQujP5o2"
+ * )
+ */
 class BaseController extends yii\rest\ActiveController
 {
     const JWT_SECRET_KEY = "NFqRh33ofXCLYQ9SvFiX3lnBa7qLl2NcMBj_gYMaTCwdcxSIqY3rYxJ2UWXiE1R0Ow0oYg4fJk9HaVGykWzFry";

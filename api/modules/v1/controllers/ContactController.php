@@ -33,18 +33,25 @@ class ContactController extends BaseController
     }
 
     /**
-     * @SWG\Get (path = "/api/webcontact/index",
-     *     tags = {"contact"},
+     * @SWG\Get (path = "/api/web/v1/contact/index",
+     *     tags = {"Contact"},
      *     summary = "Get the list of all contact",
      *     @SWG\Response (
      *       response = 200,
      *       description = "List of all courses response",
      *     @SWG\Schema(ref = "#/definitions/Contact")
      *
-     *          )
-     *     )
-     *   )
+     *          ),
      *
+     *     @SWG\Response (
+     *       response = 401,
+     *       description = "Invalid token",
+     *       @SWG\Schema(ref = "#/definitions/JWT")
+     *
+     *          ),
+     *   security={{
+     *     "Bearer":{}
+     *   }}
      * )
      */
     public function actionIndex()
@@ -60,10 +67,52 @@ class ContactController extends BaseController
         return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contacts];
     }
 
+    /**
+     * @SWG\Get (path = "/api/web/v1/contact/view?code={code}",
+     *     @SWG\Parameter (
+     *      in = "path",
+     *     name = "code",
+     *     required = true,
+     *     type = "string",
+     *     description = "veiw the contact",
+     *    ),
+     *     tags = {"Contact"},
+     *     summary = "Get the contact details",
+     *     @SWG\Response (
+     *       response = 200,
+     *       description = "List of all courses response",
+     *       @SWG\Schema(ref = "#/definitions/Contact")
+     *
+     *          ),
+     *
+     *     @SWG\Response (
+     *       response = 401,
+     *       description = "Invalid token",
+     *       @SWG\Schema(ref = "#/definitions/JWT")
+     *
+     *          ),
+     *
+     *     @SWG\Response(
+     *       response = 404,
+     *       description = "Contact not found",
+     *       @SWG\Schema(type = "object",
+     *         @SWG\Property(property="status", type="boolean", example = "0"),
+     *         @SWG\Property(property = "message", type = "string", example = "Contact not found"),
+     *         @SWG\Property(property = "payload", type = "object",
+     *           @SWG\Property(property="code", type="string", example = "Contact not found"),
+     *         )
+     *      )
+     *  ),
+     *   security={{
+     *     "Bearer":{}
+     *   }}
+     * )
+     */
     public function actionView($code)
     {
         $contact = Contact::find()->where(['code'=>$code])->one();
         if($contact == null){
+            Yii::$app->response->statusCode = 404;
 
             $error = ['code' => 'Contact not found'];
 
@@ -85,6 +134,68 @@ class ContactController extends BaseController
         return ['status' => Contact::SUCCESS_STATUS_CODE , 'message' => 'Success', 'payload' => $contact];
     }
 
+    /**
+     * @SWG\Post(path="/api/web/v1/contact/create",
+     *     @SWG\Parameter(
+     *      in = "body",
+     *     name = "body",
+     *     required = true,
+     *     description = "Create the contact",
+     *     @SWG\Schema(
+     *        @SWG\Definition(required = {"firstname", "email"}),
+     *        @SWG\Property(property = "firstname", type = "string", example = "demo07"),
+     *        @SWG\Property(property = "lastname", type = "string", example = "user"),
+     *        @SWG\Property(property = "email", type = "string", example = "demouser07@gmail.com"),
+     *        @SWG\Property(property = "code", type = "string", example = "demo07user"),
+     *        @SWG\Property(property = "company", type = "string", example = "handysolver"),
+     *        @SWG\Property(property = "mobile_number", type = "integer", example = "123456789"),
+     *        @SWG\Property(property = "phone_number", type = "integer", example = "01126026347"),
+     *        @SWG\Property(property = "job_title", type = "string", example = "Software Engineer"),
+     *        @SWG\Property(property = "website", type = "string", example = "https://www.google.com"),
+     *        @SWG\Property(property = "notes", type = "string", example = "123456"),
+     *        @SWG\Property(property = "address", type = "string", example = "M-36/48 GK"),
+     *       @SWG\Property(property = "pollguru", type = "integer", example = 0),
+     *       @SWG\Property(property = "buzz", type = "integer", example = 0),
+     *       @SWG\Property(property = "learning_arcade", type = "integer", example = 1),
+     *       @SWG\Property(property = "training_pipeline", type = "integer", example = 0),
+     *       @SWG\Property(property = "leadership_edge", type = "integer", example = 1),
+     *       @SWG\Property(property = "city", type = "string", example = "New Delhi"),
+     *     @SWG\Property(property = "state", type = "string", example = "Delhi"),
+     *     @SWG\Property(property = "pincode", type = "string", example = "110019"),
+     *     @SWG\Property(property = "created_by", type = "integer", example = 17),
+     *     )
+     * ),
+     *     tags={"Contact"},
+     *     summary="Create the contact",
+     *     @SWG\Response(
+     *         response = 200,
+     *         description = "Success",
+     *     @SWG\Schema(ref = "#/definitions/Contact")
+     *     ),
+     *     @SWG\Response (
+     *       response = 401,
+     *       description = "Invalid token",
+     *       @SWG\Schema(ref = "#/definitions/JWT")
+     *
+     *          ),
+     *     @SWG\Response(
+     *       response = 422,
+     *       description = "Missing required fields",
+     *       @SWG\Schema(type = "object",
+     *         @SWG\Property(property="status", type="boolean", example = "0"),
+     *         @SWG\Property(property = "message", type = "string", example = "Missing required fields"),
+     *         @SWG\Property(property = "payload", type = "object",
+     *           @SWG\Property(property="firstname", type="string", example = "firstname is required"),
+     *           @SWG\Property(property="email", type="string", example = "Email is required, email abc@gmail.com has already been taken"),
+     *           @SWG\Property(property="code", type="string", example = "code demo07user has already been taken"),
+     *         )
+     *      )
+     *  ),
+     *   security={{
+     *     "Bearer":{}
+     *   }}
+     * )
+     */
     //In create action, we have to just call the lead create API and the data will automatically add in contact doctype and address doctype
     public function actionCreate()
     {
@@ -156,6 +267,8 @@ class ContactController extends BaseController
 
         if (!$contact->save()){
             $errorDescription = '';
+            Yii::$app->response->statusCode = 422;
+
             foreach($contact->getErrors() as $key => $values) {
                 $validationErrors[$key] = implode(',',$values);
                 $errorDescription = $errorDescription . implode(',' , $values);
@@ -243,6 +356,85 @@ class ContactController extends BaseController
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /**
+     * @SWG\Put(path="/api/web/v1/contact/update?code={code}",
+     *    @SWG\Parameter (
+     *      in = "path",
+     *     name = "code",
+     *     required = true,
+     *     type = "string",
+     *     description = "update the contact",
+     *    ),
+     *     @SWG\Parameter(
+     *      in = "body",
+     *     name = "body",
+     *     required = true,
+     *     description = "Update the contact",
+     *     @SWG\Schema(
+     *        @SWG\Definition(required = {"firstname", "email"}),
+     *        @SWG\Property(property = "firstname", type = "string", example = "demo07"),
+     *        @SWG\Property(property = "lastname", type = "string", example = "user"),
+     *        @SWG\Property(property = "email", type = "string", example = "demouser07@gmail.com"),
+     *        @SWG\Property(property = "code", type = "string", example = "demo07user"),
+     *        @SWG\Property(property = "company", type = "string", example = "handysolver"),
+     *        @SWG\Property(property = "mobile_number", type = "integer", example = "123456789"),
+     *        @SWG\Property(property = "phone_number", type = "integer", example = "01126026347"),
+     *        @SWG\Property(property = "job_title", type = "string", example = "Software Engineer"),
+     *        @SWG\Property(property = "website", type = "string", example = "https://www.google.com"),
+     *        @SWG\Property(property = "notes", type = "string", example = "123456"),
+     *        @SWG\Property(property = "address", type = "string", example = "M-36/48 GK"),
+     *       @SWG\Property(property = "pollguru", type = "integer", example = 0),
+     *       @SWG\Property(property = "buzz", type = "integer", example = 0),
+     *       @SWG\Property(property = "learning_arcade", type = "integer", example = 1),
+     *       @SWG\Property(property = "training_pipeline", type = "integer", example = 0),
+     *       @SWG\Property(property = "leadership_edge", type = "integer", example = 1),
+     *       @SWG\Property(property = "city", type = "string", example = "New Delhi"),
+     *     @SWG\Property(property = "state", type = "string", example = "Delhi"),
+     *     @SWG\Property(property = "pincode", type = "string", example = "110019"),
+     *     )
+     * ),
+     *     tags={"Contact"},
+     *     summary="Update the contact",
+     *     @SWG\Response(
+     *         response = 200,
+     *         description = "Success",
+     *     @SWG\Schema(ref = "#/definitions/Contact")
+     *     ),
+     *     @SWG\Response (
+     *       response = 401,
+     *       description = "Invalid token",
+     *       @SWG\Schema(ref = "#/definitions/JWT")
+     *
+     *          ),
+     *     @SWG\Response(
+     *       response = 422,
+     *       description = "Missing required fields",
+     *       @SWG\Schema(type = "object",
+     *         @SWG\Property(property="status", type="boolean", example = "0"),
+     *         @SWG\Property(property = "message", type = "string", example = "Missing required fields"),
+     *         @SWG\Property(property = "payload", type = "object",
+     *           @SWG\Property(property="firstname", type="string", example = "firstname is required"),
+     *           @SWG\Property(property="email", type="string", example = "Email is required, email abc@gmail.com has already been taken "),
+     *          @SWG\Property(property="code", type="string", example = "code is required, code demo07user has already been taken"),
+     *         )
+     *      )
+     *  ),
+     *      @SWG\Response(
+     *       response = 404,
+     *       description = "Contact not found",
+     *       @SWG\Schema(type = "object",
+     *         @SWG\Property(property="status", type="boolean", example = "0"),
+     *         @SWG\Property(property = "message", type = "string", example = "Contact not found"),
+     *         @SWG\Property(property = "payload", type = "object",
+     *           @SWG\Property(property="code", type="string", example = "Contact with passed code could not be found"),
+     *         )
+     *      )
+     *  ),
+     *   security={{
+     *     "Bearer":{}
+     *   }}
+     * )
+     */
     //In update action, we have to lead, contact and address APIs. data will not automatically update in contact doctype and address doctype
     public function actionUpdate($code)
     {
@@ -253,6 +445,7 @@ class ContactController extends BaseController
         $contact =Contact::find()->where(['code'=>$code])->one();
 
         if(!isset($contact)) {
+            Yii::$app->response->statusCode = 404;
             $error = ['code' => 'Contact with passed code could not be found'];
 
             //Save the error in system log
@@ -279,6 +472,7 @@ class ContactController extends BaseController
                 $result = ['code' => 'code is required','firstname' => 'firstname is required', 'email' => 'email is required'];
             }
 
+            Yii::$app->response->statusCode = 422;
             //Save the error in system log
             Yii::error($result,'CRM APIs');
 
@@ -337,6 +531,8 @@ class ContactController extends BaseController
                 $validationErrors[$key] = implode(',',$values);
                 $errorDescription = $errorDescription . implode(',' ,$values);
             }
+            Yii::$app->response->statusCode = 422;
+
             //Save the error in system log
             Yii::error($validationErrors,'CRM APIs');
 

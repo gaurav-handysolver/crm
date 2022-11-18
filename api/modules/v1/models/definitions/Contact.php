@@ -3,7 +3,7 @@
 namespace api\modules\v1\models\definitions;
 
 /**
- * @SWG\Definition(required={"firstname", "email"})
+ * @SWG\Definition(required={"payload"})
  *
  * @SWG\Property(property = "status", type = "boolean", example = "1"),
  * @SWG\Property(property = "message", type = "string", example = "success"),

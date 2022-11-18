@@ -152,12 +152,12 @@ class OneHashService
             ],
             "phone_nos" => [
                 [
-                    "phone" => $model->phone_number?$model->phone_number:0,
+                    "phone" => "$model->phone_number",
                     "is_primary_phone" => 1,
                     "is_primary_mobile_no"=> 0
                 ],
                 [
-                    "phone" => $model->mobile_number?$model->mobile_number:0,
+                    "phone" => "$model->mobile_number",
                     "is_primary_phone" => 0,
                     "is_primary_mobile_no" => 1
                 ]
@@ -236,8 +236,8 @@ class OneHashService
             "state"=> $model->state ?: "NA",
             "country"=> $model->country,
             "pincode"=> $model->pincode ?: "NA",
-            "phone"=> $model->phone_number,
-            "mobile_no"=> $model->mobile_number,
+            "phone"=> "$model->phone_number",
+            "mobile_no"=> "$model->mobile_number",
             "website"=> $model->website,
             "job_title" => $model->job_title
         );
@@ -286,7 +286,7 @@ class OneHashService
             if($httpCode == Contact::SUCCESS_RESPONSE){
                 return array('status' => true, 'msg' => 'Contact is updated on onehash', 'payload' => json_decode($response));
             }else{
-                $functionName = 'OneHash-Update function';
+                $functionName = 'OneHash-Update Lead function';
                 return array('status' => false, 'msg' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
             }
         }
@@ -359,7 +359,7 @@ class OneHashService
             "state"=> $model->state ?: "NA",
             "country"=> $model->country ?: "United States",
             "pincode"=> $model->pincode ?: "NA",
-            "phone"=> $model->phone_number,
+            "phone"=> "$model->phone_number",
             "email_id" => $model->email
         );
         $data = json_encode($dataArray);

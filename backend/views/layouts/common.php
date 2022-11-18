@@ -381,6 +381,11 @@ $logEntries[] = [
                             'url' => ['/one-hash/save-setting'],
                             'icon' => FAS::icon('cog', ['class' => ['nav-icon']]),
                         ],
+                        [
+                            'label' => Yii::t('backend', 'CRM APIs'),
+                            'url' => ['/swagger/docs'],
+                            'icon' => FAS::icon('code', ['class' => ['nav-icon']]),
+                        ],
                     ],
                 ]) ?>
             </nav>
