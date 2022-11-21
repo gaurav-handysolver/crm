@@ -426,7 +426,7 @@ class OneHashService
             "leadership_edge"=> $model->leadership_edge,
             "notes"=> $model->notes,
             "address_title"=> $model->firstname." ".$model->address_type." address",
-            "address_type"=> $model->address_type,
+            "address_type"=> $model->address_type ?: "Personal",
             "address_line1"=> empty($model->address) ? 'NA' : $model->address,
             "city"=> empty($model->city) ? 'NA' : $model->city,
             "state"=> empty($model->state) ? 'NA' : $model->state,
