@@ -45,17 +45,17 @@ class OneHashService
                 'error' => "Lead-Address Getting oneHash API curl error"
             ];
         } else {
+            $functionName = 'Find-OneHash-Contact function';
             if($httpCode == Contact::SUCCESS_RESPONSE){
                 $data = json_decode($response)->data;
                 if(isset($data) && !empty($data)){
                     $contactName = $data[0]->name;
                     return array('status'=>1,'message' => 'Contact found', 'payload' => $contactName);
                 }else{
-                    return array('status'=>0,'message'=>'Contact not found','payload' => 'Contact not found');
+                    return array('status'=>0,'message'=>'Contact not found on Onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
                 }
             }else{
-                $functionName = 'Find-OneHash-Contact function';
-                return array('status' => 0, 'message' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => 0, 'message' => 'Contact not found','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -124,7 +124,7 @@ class OneHashService
                 return array('status' => 1, 'message' => 'Contact image updated on onehash', 'payload' => json_decode($response)->message->file_url);
             }else{
                 $functionName = 'OneHash-Image-Update function';
-                return array('status' => 0, 'message' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => 0, 'message' => 'Image not updated on Onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -202,7 +202,7 @@ class OneHashService
                 return array('status' => 1, 'message' => 'Contact is updated', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Contact-Update function';
-                return array('status' => 0, 'message' => 'Contact is not updated with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => 0, 'message' => 'Contact is not updated on Onehash','payload' => 'Contact is not updated with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
 
             }
         }
@@ -277,17 +277,17 @@ class OneHashService
         curl_close($curl);
 
         if ($err) {
-            Yii::error("Contact update oneHash API curl error #:" . $err);
+            Yii::error("Lead update oneHash API curl error #:" . $err);
             return [
                 'status'=>false,
-                'error' => "Contact update oneHash API curl error"
+                'error' => "Lead update oneHash API curl error"
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => 1, 'message' => 'Contact is updated on onehash', 'payload' => json_decode($response));
+                return array('status' => 1, 'message' => 'Lead is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Update Lead function';
-                return array('status' => 0, 'message' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => 0, 'message' => 'Lead is not updated on Onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -335,7 +335,7 @@ class OneHashService
                 return array('status' => 1, 'message' => 'Lead address is found', 'payload' => json_decode($response)->data[0]->name);
             }else{
                 $functionName = 'Find-OneHash-Address function';
-                return array('status' => 0, 'message' => 'Lead address is not found with response code '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => 0, 'message' => 'Address is not found on Onehash','payload' => 'Lead address is not found with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
 
             }
         }
@@ -398,7 +398,7 @@ class OneHashService
                 return array('status' => 1, 'message' => 'Contact address is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Address-Update function';
-                return array('status' => 0, 'message' => 'Contact address is not updated on onehash with response code  '.$httpCode .' in '.$functionName,'payload' => $response);
+                return array('status' => 0, 'message' => 'Address is not updated on Onehash','payload' => 'Contact address is not updated on onehash with response code  '.$httpCode .' in '.$functionName.' and the error is '.$response);
 
             }
         }
@@ -471,10 +471,10 @@ class OneHashService
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'message' => 'Contact is created on onehash', 'payload' => json_decode($response)->data->name);
+                return array('status' => 1, 'message' => 'Contact is created on onehash', 'payload' => json_decode($response)->data->name);
             }else{
                 $functionName = 'OneHash-Create function';
-                return array('status' => false, 'message' => 'contact is not created on onehash','payload' => 'Contact is not created on onehash with response code  '.$httpCode .' in '.$functionName. 'and the error is '.$response);
+                return array('status' => 0, 'message' => 'contact is not created on onehash','payload' => 'Contact is not created on onehash with response code  '.$httpCode .' in '.$functionName. 'and the error is '.$response);
 
             }
         }
@@ -531,10 +531,10 @@ class OneHashService
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'message' => 'Lead is updated on onehash', 'payload' => json_decode($response));
+                return array('status' => 1, 'message' => 'Lead is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Update function';
-                return array('status' => false, 'message' => 'Lead is not updated on onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
+                return array('status' => 0, 'message' => 'Lead is not updated on onehash','payload' => 'Onehash API Error with response code '.$httpCode .' in '.$functionName.' and the error is '.$response);
             }
         }
     }
@@ -585,10 +585,10 @@ class OneHashService
             ];
         } else {
             if($httpCode == Contact::SUCCESS_RESPONSE){
-                return array('status' => true, 'message' => 'Contact is updated on onehash', 'payload' => json_decode($response));
+                return array('status' => 1, 'message' => 'Contact is updated on onehash', 'payload' => json_decode($response));
             }else{
                 $functionName = 'OneHash-Contact-Update function';
-                return array('status' => false, 'message' => 'Contact is not updated on onehash','payload' => 'Contact is not updated with response code '.$httpCode .' in '.$functionName.' and the error is ' .$response);
+                return array('status' => 0, 'message' => 'Contact is not updated on onehash','payload' => 'Contact is not updated with response code '.$httpCode .' in '.$functionName.' and the error is ' .$response);
 
             }
         }
