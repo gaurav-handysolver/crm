@@ -47,9 +47,9 @@ class AwsParameterStore
         }
 
         if(isset($result["Name"])){
-            return  array("status"=> true,"oneHashTokenValue"=>$result["Value"],"msg"=>"Data Found");
+            return  array("status"=> 1,"oneHashTokenValue"=>$result["Value"],"message"=>"Data Found");
         }else{
-            return array("status"=>false,"oneHashTokenValue"=>null,"msg"=>$response);
+            return array("status"=>0,"oneHashTokenValue"=>null,"message"=>$response);
         }
 
     }
